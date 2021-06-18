@@ -80,7 +80,7 @@ def myClick():
         reader = csv.reader(file)
         for line in reader:
             print(line)
-            if line[0].lower() == userEntry.lower() and line[1] == passEntry:
+            if line[0].lower().strip() == userEntry.lower() and line[1].strip() == passEntry:
                 print("In file")
                 foundFlag = True
                 activeUser = userEntry
