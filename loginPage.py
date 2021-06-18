@@ -43,7 +43,7 @@ passwordLabel = Label(root, text = "Password: ", font = usernameFont, bg = c2)
 passwordLabel.place(x = sx/2 - 97, y = sy/2 - 20, anchor = N)
 
 # Logo image
-logo = ImageTk.PhotoImage(Image.open("img/Dollar Sign.png").resize((150, 150)))
+logo = ImageTk.PhotoImage(Image.open("img/Dollar Sign.png").resize((120, 120)))
 logoImage = Label(image = logo)
 logoImage.place(x = sx/2, y = sy/2 - 270, anchor = N)
 
@@ -72,24 +72,25 @@ def popupLogin(message):
 def myClick():
     global activeUser
     print("Login submit button clicked")
-
-
+    userEntry = uInput.get()
+    passEntry = pInput.get()
+    foundFlag = False
     # Check username
     with open('UserData/userList.csv', 'r') as file:
         reader = csv.reader(file)
         for line in reader:
             print(line)
-            if uInput.get() in line:
-                #print("In file")
-                activeUser = uInput.get()
-                popupLogin("Welcome " + activeUser + "!")
-            else:
-                print("Username (" + uInput.get() + ") not found")
-                popupLogin("Username not found")
-                usernameLabel.config(font = ("Comic Sans MS", 18))
-                usernameLabel.config(fg = "red")
-                usernameLabel.config(text = "Wrong username")
-                usernameLabel.place(x = sx/2 - 60, y = sy/2 - 100, anchor = N)
+            if line[0].lower() == userEntry.lower() and line[1] == passEntry:
+                print("In file")
+                foundFlag = True
+                activeUser = userEntry
+                popupLogin("Welcome " + line[0] + "!")
+                break
+        if not foundFlag:
+            print("Username (" + userEntry + ") not found")
+            #popupLogin("Username not found")
+            warningLabel = Label(root, text = "Incorrent credentials", bg = c2)
+            warningLabel.place(x = sx/2 - 30, y = sy/2 - 130, anchor = N)
     uInput.delete(0, END)
 
     print("Active user:", activeUser)
