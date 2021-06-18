@@ -1,3 +1,6 @@
+DATE, EXPENSE_NAME, PLANNED, ACTUAL, RECURRING
 Date4, expenseName4, amount4
 Date5, expenseName5, amount5
 Date6, expenseName6, amount6
+
+This is useless information
