@@ -1,2 +1,3 @@
-UserOne,UserTwo, userThree
-password1, password2, password3
+UserOne, password1
+UserTwo, password2
+UserThree, password3
