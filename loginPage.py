@@ -17,8 +17,8 @@ root.title("Budget Boi")
 root.iconbitmap("img/WayneStateLogo.ico")
 
 # Define colors
-c1 = "#56C3A2"
-c2 = "#41927A"
+mainColor = "#56C3A2"
+accentColor = "#57729E"
 
 # Define fonts
 buttonFont = font.Font(size = 24)
@@ -27,20 +27,20 @@ inputFont = font.Font(size = 20)
 # Create canvas
 canvas = Canvas(root, width = sx, height = sy)
 canvas.pack()
-canvas.config(background=c1)
+canvas.config(background=mainColor)
 
 # Form outline
-canvas.create_rectangle(sx/2 - 200, sy/6, sx/2 + 200, 2*sy/3-50, fill = c2, width = 0)
+canvas.create_rectangle(sx/2 - 200, sy/6, sx/2 + 200, 2*sy/3-50, fill = accentColor, width = 0)
 
 # Create labels for login and place them
 usernameFont = font.Font(size = 16)
-usernameLabel = Label(root, text = "Username: ", font = usernameFont, bg = c2)
-usernameLabel.place(x = sx/2 - 97, y = sy/2 - 100, anchor = N)
-loginLabel = Label(root, text = "Login", font = usernameFont, bg = c2)
+usernameLabel = Label(root, text = "Username: ", font = usernameFont, bg = accentColor)
+usernameLabel.place(x = sx/2 - 97, y = sy/2 - 110, anchor = N)
+loginLabel = Label(root, text = "Login", font = usernameFont, bg = accentColor)
 loginLabel.place(x = sx/2, y = sy/2 - 350, anchor = N)
 loginLabel.config(font = ("Courier", 44))
-passwordLabel = Label(root, text = "Password: ", font = usernameFont, bg = c2)
-passwordLabel.place(x = sx/2 - 97, y = sy/2 - 20, anchor = N)
+passwordLabel = Label(root, text = "Password: ", font = usernameFont, bg = accentColor)
+passwordLabel.place(x = sx/2 - 97, y = sy/2 - 40, anchor = N)
 
 # Logo image
 logo = ImageTk.PhotoImage(Image.open("img/Dollar Sign.png").resize((120, 120)))
@@ -50,9 +50,9 @@ logoImage.place(x = sx/2, y = sy/2 - 270, anchor = N)
 
 # Create input box for username and password
 uInput = Entry(root, width = 20, font = inputFont)
-uInput.place(x = sx/2, y = sy/2 - 60, anchor = N)
-pInput = Entry(root, width = 20, font = inputFont)
-pInput.place(x=sx/2, y = sy/2 + 20, anchor = N)
+uInput.place(x = sx/2, y = sy/2 - 80, anchor = N)
+pInput = Entry(root, width = 20, font = inputFont, show = '*')
+pInput.place(x=sx/2, y = sy/2 - 10, anchor = N)
 
 
 activeUser = ""
@@ -84,15 +84,16 @@ def myClick():
                 print("In file")
                 foundFlag = True
                 activeUser = userEntry
-                popupLogin("Welcome " + line[0] + "!")
+                #popupLogin("Welcome " + line[0] + "!")
                 break
         if not foundFlag:
             print("Username (" + userEntry + ") not found")
             #popupLogin("Username not found")
-            warningLabel = Label(root, text = "Incorrent credentials", bg = c2)
-            warningLabel.place(x = sx/2 - 30, y = sy/2 - 130, anchor = N)
+            warningLabel = Label(root, text = "Incorrect credentials", fg = "#FF890A", bg = accentColor)
+            warningLabel.config(font = ("Verdana", 12))
+            warningLabel.place(x = sx/2 - 70, y = sy/2 + 30, anchor = N)
     uInput.delete(0, END)
-
+    pInput.delete(0, END)
     print("Active user:", activeUser)
 
 
