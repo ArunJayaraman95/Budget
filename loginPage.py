@@ -4,6 +4,8 @@ from tkinter import messagebox
 import tkinter.font as font
 from PIL import ImageTk, Image
 import csv
+import pyautogui as pg
+#import time
 
 # Define colors
 mainColor = "#56C3A2"
@@ -28,13 +30,15 @@ root.rowconfigure(0, weight = 1)
 root.columnconfigure(0, weight = 1)
 
 loginFrame = Frame(root, background = mainColor)
-newAccountFrame = Frame(root, background = mainColor)
+registerFrame = Frame(root, background = mainColor)
 
-for frame in (loginFrame, newAccountFrame):
+for frame in (loginFrame, registerFrame):
     frame.grid(row = 0, column = 0, sticky = "nsew")
 
-showFrame(newAccountFrame)
-
+showFrame(registerFrame)
+# time.sleep(1)
+# pg.click(1850, 10)
+# pg.click(1850, 10)
 # Set screen width (sx) and height (sy)
 sx = root.winfo_screenwidth() 
 sy = root.winfo_screenheight()
@@ -81,9 +85,10 @@ def submitLogin():
 # Create subframe
 widthAdjuster = 0.4
 heightAdjuster = 0.2
-loginMenu = Frame(loginFrame, width =0, height = sy/2, bg = accentColor)
-loginMenu.grid(row = 0, column = 0, padx = sx * widthAdjuster, pady = sy * heightAdjuster, ipadx = 0, ipady = 0)
-#loginMenu.grid_propagate(0)
+loginMenu = Frame(loginFrame, bg = accentColor)
+#loginMenu.grid(row = 0, column = 0, padx = sx * widthAdjuster, pady = sy * heightAdjuster, ipadx = 0, ipady = 0)
+#loginMenu.place(height = 500, width = 400, anchor = CENTER, rely = 0.5, relx = 0.5)
+loginMenu.pack()
 
 # Labels
 loginTitle = Label(loginMenu, text = "Login", font = ("Courier", 80), bg = accentColor)
@@ -105,7 +110,7 @@ pInput.grid(row = 4, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = '
 # Create buttons
 submitButton = Button(loginMenu, text = "Submit", bg = "#A9e451", padx = 10, pady = 0, font = ("Verdana", 15), command = submitLogin)
 submitButton.grid(row = 5, column = 1, padx = 20, pady = 10, sticky = 'ew')
-registerButton = Button(loginMenu, text = "Make new account", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(newAccountFrame))
+registerButton = Button(loginMenu, text = "Make new account", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(registerFrame))
 registerButton.grid(row = 5, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
 #endregion
@@ -145,10 +150,11 @@ def registerAccount():
     prInput.delete(0, END)
     pcInput.delete(0, END)
 
-widthAdjuster2 = 0.4
+widthAdjuster2 = 0.37
 heightAdjuster2 = 0.2
-registerMenu = Frame(newAccountFrame, width = 1000, height = sy/2, bg = accentColor)
-registerMenu.grid(row = 0, column = 0, padx = sx * widthAdjuster2, pady = sy * heightAdjuster2, ipadx = 0, ipady = 0)
+registerMenu = Frame(registerFrame, bg = accentColor)
+#registerMenu.grid(row = 0, column = 0, padx = sx * widthAdjuster2, pady = sy * heightAdjuster2, ipadx = 0, ipady = 0)
+registerMenu.place(height = 500, width = 460, anchor = CENTER, rely = 0.5, relx = 0.5)
 
 
 # Create labels for login and place them
@@ -182,14 +188,5 @@ confirmButton.grid(row = 7, column = 1, padx = 20, pady = 10, sticky = 'ew')
 returnButton = Button(registerMenu, text = "Return to login", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(loginFrame))
 returnButton.grid(row = 7, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
-"""
 
-#Create buttons
-confirmButton = Button(newAccountFrame, text = "Register", bg = "#A9e451", padx = 10, pady = 0, font = ("Verdana", 15), command = registerAccount)
-confirmButton.place(x = sx/2, y = sy/2 + 70, anchor = NW)
-returnButton = Button(newAccountFrame, text = "Return to login", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(loginFrame))
-returnButton.place(x = sx/2 - 155, y = sy/2 + 80, anchor = NW)
-"""
-
-
-loginFrame.mainloop()
+root.mainloop()
