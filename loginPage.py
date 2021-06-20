@@ -99,6 +99,7 @@ def submitLogin():
     passEntry = pInput.get()
     foundFlag = False
     # Check username
+    print("Userentry", userEntry, uInput.get())
     with open('UserData/userList.csv', 'r') as file:
         reader = csv.reader(file)
         for line in reader:
@@ -165,9 +166,11 @@ pcInput.place(x=sx/2, y = sy/2 - 110, anchor = N)
 
 def registerAccount():
     print("Register account clicked")
+    # Store entries
     userEntry = uInput.get()
     passEntry = pInput.get()
     confEntry = pcInput.get()
+
     foundFlag = False
     # Check username
     with open('UserData/userList.csv', 'r') as file:
