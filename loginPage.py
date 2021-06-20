@@ -33,7 +33,7 @@ newAccountFrame = Frame(root, background = mainColor)
 for frame in (loginFrame, newAccountFrame):
     frame.grid(row = 0, column = 0, sticky = "nsew")
 
-showFrame(loginFrame)
+showFrame(newAccountFrame)
 
 # Set screen width (sx) and height (sy)
 sx = root.winfo_screenwidth() 
@@ -44,6 +44,7 @@ root.geometry("%dx%d" % (sx, sy))
 root.title("Budget Boi")
 root.iconbitmap("img/WayneStateLogo.ico")
 
+#region Frame1
 #============Frame 1 ==============# 
 # Variables
 activeUser = ""
@@ -107,14 +108,7 @@ submitButton.grid(row = 5, column = 1, padx = 20, pady = 10, sticky = 'ew')
 registerButton = Button(loginMenu, text = "Make new account", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(newAccountFrame))
 registerButton.grid(row = 5, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
-
-
-
-
-
-
-
-
+#endregion
 
 # ===============Frame 2=====================#
 
@@ -153,8 +147,8 @@ def registerAccount():
 
 widthAdjuster2 = 0.4
 heightAdjuster2 = 0.2
-registerMenu = Frame(newAccountFrame, width =0, height = sy/2, bg = accentColor)
-loginMenu.grid(row = 0, column = 0, padx = sx * widthAdjuster2, pady = sy * heightAdjuster2, ipadx = 0, ipady = 0)
+registerMenu = Frame(newAccountFrame, width = 1000, height = sy/2, bg = accentColor)
+registerMenu.grid(row = 0, column = 0, padx = sx * widthAdjuster2, pady = sy * heightAdjuster2, ipadx = 0, ipady = 0)
 
 
 # Create labels for login and place them
@@ -181,21 +175,14 @@ prInput.grid(row = 4, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 
 pcInput = Entry(registerMenu, width = 20, font = inputFont, show = '*')
 pcInput.grid(row = 6, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
 
+#Create buttons
+confirmButton = Button(registerMenu, text = "Register", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = registerAccount)
+confirmButton.grid(row = 7, column = 1, padx = 20, pady = 10, sticky = 'ew')
+
+returnButton = Button(registerMenu, text = "Return to login", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(loginFrame))
+returnButton.grid(row = 7, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
 """
-
-
-
-# Create input box for username and password
-urInput = Entry(newAccountFrame, width = 20, font = inputFont)
-urInput.place(x = sx/2, y = sy/2 - 250, anchor = N)
-prInput = Entry(newAccountFrame, width = 20, font = inputFont, show = '*')
-prInput.place(x=sx/2, y = sy/2 - 180, anchor = N)
-pcInput = Entry(newAccountFrame, width = 20, font = inputFont, show = '*')
-pcInput.place(x=sx/2, y = sy/2 - 110, anchor = N)
-
-
-
 
 #Create buttons
 confirmButton = Button(newAccountFrame, text = "Register", bg = "#A9e451", padx = 10, pady = 0, font = ("Verdana", 15), command = registerAccount)
