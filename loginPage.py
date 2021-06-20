@@ -89,7 +89,7 @@ loginMenu = Frame(loginFrame, bg = accentColor)
 #loginMenu.grid(row = 0, column = 0, padx = sx * widthAdjuster, pady = sy * heightAdjuster, ipadx = 0, ipady = 0)
 #loginMenu.place(height = 500, width = 400, anchor = CENTER, rely = 0.5, relx = 0.5)
 loginMenu.pack()
-
+loginMenu.config()
 # Labels
 loginTitle = Label(loginMenu, text = "Login", font = ("Courier", 80), bg = accentColor)
 loginTitle.grid(row = 0, column = 0, padx = 10, pady = 10, columnspan = 2, sticky = "ew")
