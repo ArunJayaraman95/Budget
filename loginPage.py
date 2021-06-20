@@ -4,8 +4,6 @@ from tkinter import messagebox
 import tkinter.font as font
 from PIL import ImageTk, Image
 import csv
-import pyautogui as pg
-#import time
 
 # Define colors
 mainColor = "#56C3A2"
@@ -24,7 +22,6 @@ root=Tk()
 root.state("zoomed")  #Makes it fullscreen automatically
 
 
-
 # Configurations
 root.rowconfigure(0, weight = 1)
 root.columnconfigure(0, weight = 1)
@@ -36,10 +33,7 @@ for frame in (loginFrame, registerFrame):
     frame.grid(row = 0, column = 0, sticky = "nsew")
 
 showFrame(registerFrame)
-# time.sleep(1)
-# pg.click(1850, 10)
-# pg.click(1850, 10)
-# Set screen width (sx) and height (sy)
+
 sx = root.winfo_screenwidth() 
 sy = root.winfo_screenheight()
 
@@ -116,7 +110,6 @@ registerButton.grid(row = 5, column = 0, padx = 20, pady = 10, sticky = 'ew')
 #endregion
 
 # ===============Frame 2=====================#
-
 
 # Functions
 def registerAccount():
