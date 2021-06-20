@@ -127,7 +127,8 @@ registerButton = Button(loginFrame, text = "Make new account", font = ("Verdana"
 registerButton.place(x = sx/2 - 85, y = sy/2 + 80, anchor = N)
 
 
-#===================Frame 2=====================#
+
+# ===============Frame 2=====================#
 # Create canvas
 canvas = Canvas(newAccountFrame, width = sx, height = sy)
 canvas.pack()
@@ -156,10 +157,10 @@ passwordConLabel.place(x = sx/2 - 155, y = sy/2 - 140, anchor = NW)
 
 
 # Create input box for username and password
-uInput = Entry(newAccountFrame, width = 20, font = inputFont)
-uInput.place(x = sx/2, y = sy/2 - 250, anchor = N)
-pInput = Entry(newAccountFrame, width = 20, font = inputFont, show = '*')
-pInput.place(x=sx/2, y = sy/2 - 180, anchor = N)
+urInput = Entry(newAccountFrame, width = 20, font = inputFont)
+urInput.place(x = sx/2, y = sy/2 - 250, anchor = N)
+prInput = Entry(newAccountFrame, width = 20, font = inputFont, show = '*')
+prInput.place(x=sx/2, y = sy/2 - 180, anchor = N)
 pcInput = Entry(newAccountFrame, width = 20, font = inputFont, show = '*')
 pcInput.place(x=sx/2, y = sy/2 - 110, anchor = N)
 
@@ -167,8 +168,8 @@ pcInput.place(x=sx/2, y = sy/2 - 110, anchor = N)
 def registerAccount():
     print("Register account clicked")
     # Store entries
-    userEntry = uInput.get()
-    passEntry = pInput.get()
+    userEntry = urInput.get()
+    passEntry = prInput.get()
     confEntry = pcInput.get()
 
     foundFlag = False
@@ -192,8 +193,8 @@ def registerAccount():
             popupLogin("USER ADDED")
             
 
-    uInput.delete(0, END)
-    pInput.delete(0, END)
+    urInput.delete(0, END)
+    prInput.delete(0, END)
     pcInput.delete(0, END)
 
 #Create buttons
