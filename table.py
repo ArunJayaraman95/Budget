@@ -103,15 +103,19 @@ style = ttk.Style()
 style.configure("Treeview.Heading", font=(None, 12))
 style.configure("Treeview", font = ("Verdana", 16), rowheight = 50)
 
-cal = tkcalendar.Calendar(tableFrame, selectmode = "day", year = 2021, month = 6, day = 20)
+cal = Calendar(tableFrame, selectmode = "day", year = 2021, month = 6, day = 20, date_pattern = 'mm/dd/yy')
 cal.pack(pady = 20)
-def grab_date():
-    tt.config(text =)
+calToggle = True
+def toggleCalendar():
+    if calToggle:
+        cal.pack_forget()
+    else:
+        cal.pack()
 
-tb = Button(tableFrame, text = "Get date", command = grab_date)
+tb = Button(tableFrame, text = "Get date", command = toggleCalendar)
+tb.pack(pady = 20, ipadx = 20, ipady = 20)
 
-tt = Label(tableFrame, text = "")
-tt.pack(pady = 20)
+
 
 #endregion
 
