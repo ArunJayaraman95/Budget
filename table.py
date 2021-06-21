@@ -81,8 +81,8 @@ testTree.heading("Actual", text = "Actual", anchor = CENTER)
 testTree.heading("Difference", text = "Difference", anchor = CENTER)
 testTree.heading("Notes", text = "Notes", anchor = CENTER)
 
-
-#testTree.insert(parent = '', index = 'end', iid = 0, text = "Parent", values = ("6/12", "Food", 300, 500))
+testTree.tag_configure('oddrow', background = "white")
+testTree.tag_configure('evenrow', background = "blue")
 
 #Add data
 expenseCount = 0
@@ -95,11 +95,18 @@ with open('UserData/'+activeUser+'.csv', 'r') as file:
             exp = '${:,.2f}'.format(float(line[2])) 
             act = '${:,.2f}'.format(float(line[3])) 
             tempTuple = (line[0], line[1], exp, act, diff, "")
-            testTree.insert(parent = '', index = 'end', iid = expenseCount, text = "Parent", values = tempTuple)
+            
+            if expenseCount % 2 == 0:
+                testTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('evenrow',))
+            else:
+                testTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('oddrow',))
             expenseCount += 1
 
 for i in range(40):
-    testTree.insert(parent = '', index = 'end', iid = expenseCount, text = "Parent", values = ("d", "n", randint(0, 100), randint(0, 100), 4, ""))
+    if expenseCount % 2 == 0:
+        testTree.insert(parent = '', index = 'end', iid = expenseCount,values = ("d", "n", randint(0, 100), randint(0, 100), 4, ""), tags = ('evenrow'))
+    else:
+        testTree.insert(parent = '', index = 'end', iid = expenseCount, values = ("d", "n", randint(0, 100), randint(0, 2), 4, ""), tags = ('oddrow',))
     expenseCount += 1
 
 # Pack table
@@ -133,7 +140,7 @@ for i, ent in enumerate(editList):
 # Button functions
 def addExpense():
     global expenseCount
-    testTree.insert(parent = '', index = 'end', iid = expenseCount, text = "Parent",values = (de.get(), ne.get(), pe.get(), ae.get(), float(pe.get()) - float(ae.get()), me.get()))
+    testTree.insert(parent = '', index = 'end', iid = expenseCount, values = (de.get(), ne.get(), pe.get(), ae.get(), float(pe.get()) - float(ae.get()), me.get()))
     expenseCount += 1
     # Delete entries
     for col in editList:
@@ -142,6 +149,13 @@ def addExpense():
 def removeAll():
     for record in testTree.get_children():
         testTree.delete(record)
+
+def removeSelected():
+    for record in testTree.selection():
+        testTree.delete(record)
+
+    
+
 # Buttons
 addButton = Button(tableFrame, text = "Add expense", command = addExpense)
 addButton.grid(row = 3, column = 0, pady = 20)
@@ -149,10 +163,20 @@ addButton.grid(row = 3, column = 0, pady = 20)
 delButton = Button(tableFrame, text = "Remove all expenses", command = removeAll)
 delButton.grid(row = 3, column = 1, pady = 20)
 
+removeEntry = Button(tableFrame, text = "Remove Selected", command = removeSelected)
+removeEntry.grid(row = 3, column = 2, pady = 20)
+
+#removeOneEntry = Button(tableFrame, text = "Remove One", command = #removeOne)
+removeEntry.grid(row = 3, column = 2, pady = 20)
+#def removeOne():
+#   testTree.delete(testTree.selection()[0])
+
+
 # Formatting (font changes)
 style = ttk.Style()
 style.configure("Treeview.Heading", font=(None, 12))
 style.configure("Treeview", font = ("Verdana", 16), rowheight = 50)
+
 
 
 
