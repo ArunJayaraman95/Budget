@@ -138,11 +138,16 @@ def addExpense():
     # Delete entries
     for col in editList:
         col.delete(0, END)
+
+def removeAll():
+    for record in testTree.get_children():
+        testTree.delete(record)
 # Buttons
 addButton = Button(tableFrame, text = "Add expense", command = addExpense)
 addButton.grid(row = 3, column = 0, pady = 20)
 
-
+delButton = Button(tableFrame, text = "Remove all expenses", command = removeAll)
+delButton.grid(row = 3, column = 1, pady = 20)
 
 # Formatting (font changes)
 style = ttk.Style()
