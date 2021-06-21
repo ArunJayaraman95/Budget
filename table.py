@@ -129,7 +129,7 @@ for i in range(40):
 testTree.pack()
 
 # Table editor
-
+'''
 dl = Label(tableFrame, text = "Date")
 nl = Label(tableFrame, text = "Name")
 pl = Label(tableFrame, text = "Planned")
@@ -152,7 +152,7 @@ me = Entry(tableFrame)
 entryEditList = [de, ne, pe, ae, me]
 for i, ent in enumerate(entryEditList):
     ent.grid(row = 2, column = i)
-
+'''
 # Button functions
 def addExpense():
     global expenseCount
@@ -182,8 +182,8 @@ def selectExpense():
     values = testTree.item(selected, 'values')
     de.insert(0, values[0])
     ne.insert(0, values[1])
-    pe.insert(0, values[2])
-    ae.insert(0, values[3])
+    pe.insert(0, values[2][1:])
+    ae.insert(0, values[3][1:])
     me.insert(0, values[5])
 
 def updateExpense():
@@ -192,20 +192,22 @@ def updateExpense():
     testTree.item(selected, text = "", values = ext(de.get(), ne.get(), pe.get(), ae.get(), me.get()))
 
 # Buttons
-addButton = Button(tableFrame, text = "Add expense", command = addExpense)
+addButton = Button(tableFrame, text = "Add expense", command = addExpense, font = usernameFont, height = 4, width = 15)
 addButton.grid(row = 3, column = 0, pady = 20)
 
-delButton = Button(tableFrame, text = "Remove all expenses", command = removeAll)
-delButton.grid(row = 3, column = 1, pady = 20)
+#delButton = Button(tableFrame, text = "Remove all expenses", command = removeAll)
+#delButton.grid(row = 3, column = 1, pady = 20)
 
-removeButton = Button(tableFrame, text = "Remove Selected", command = removeSelected)
-removeButton.grid(row = 3, column = 2, pady = 20)
+updateButton = Button(tableFrame, text = "Edit Entry", font = usernameFont, command = updateExpense, height = 4, width = 15)
+updateButton.grid(row = 3, column = 2, pady = 20)
 
-selectButton = Button(tableFrame, text = "Select Entry", command = selectExpense)
-selectButton.grid(row = 3, column = 3, pady = 20)
+removeButton = Button(tableFrame, text = "Delete Entry", font = usernameFont, command = removeSelected, height = 4, width = 15)
+removeButton.grid(row = 3, column = 4, pady = 20)
 
-updateButton = Button(tableFrame, text = "Update Expense", command = updateExpense)
-updateButton.grid(row = 3, column = 4, pady = 20)
+#selectButton = Button(tableFrame, text = "Select Entry", command = selectExpense)
+#selectButton.grid(row = 3, column = 3, pady = 20)
+
+
 
 
 #removeOneEntry = Button(tableFrame, text = "Remove One", command = #removeOne)
