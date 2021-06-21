@@ -5,7 +5,7 @@ import tkinter.font as font
 from tkinter import ttk
 import csv
 from tkcalendar import *
-
+from random import randint
 # Define colors
 mainColor = "#70A0A2"
 accentColor = "#57729E"
@@ -48,9 +48,13 @@ activeUser = "test"
 # Create subframe
 viewFrame = Frame(tableFrame, bg = accentColor)
 viewFrame.place(height = 500, width = 1000, relx = 0.5, rely = 0.6, anchor = CENTER)
-viewFrame.config(highlightbackground='red', highlightthickness=4)
-# Labels
-testTree = ttk.Treeview(viewFrame)
+viewFrame.config(highlightbackground='black', highlightthickness=4)
+
+# Scrollbar and table setup
+tableScroll = ttk.Scrollbar(viewFrame, orient = 'vertical')
+tableScroll.pack(side = RIGHT, fill = Y)
+testTree = ttk.Treeview(viewFrame, yscrollcommand= tableScroll.set)
+tableScroll.config(command = testTree.yview)
 
 # Define columns
 testTree['columns'] = ("Date", "Name", "Planned", "Actual", "Difference", "Notes")
@@ -62,7 +66,7 @@ testTree.column("Name", width = 120, anchor = W)
 testTree.column("Planned", width = 150, anchor = E)
 testTree.column("Actual", width = 150, anchor = E)
 testTree.column("Difference", width = 150, anchor = E)
-testTree.column("Notes", width = 350, anchor = E)
+testTree.column("Notes", width = 330, anchor = E)
 
 
 
@@ -92,11 +96,14 @@ with open('UserData/'+activeUser+'.csv', 'r') as file:
             counter += 1
 
 for i in range(40):
-    testTree.insert(parent = '', index = 'end', iid = counter, text = "Parent", values = tempTuple)
+    testTree.insert(parent = '', index = 'end', iid = counter, text = "Parent", values = ("d", "n", randint(0, 100), randint(0, 100), 4, ""))
     counter += 1
+
+# Pack table
 testTree.pack()
-vsb = ttk.Scrollbar(tableFrame, orient = 'vertical', command = testTree.yview)
-vsb.pack(side = 'right', fill = 'y')
+
+
+
 
 # Formatting (font changes)
 style = ttk.Style()
@@ -104,13 +111,17 @@ style.configure("Treeview.Heading", font=(None, 12))
 style.configure("Treeview", font = ("Verdana", 16), rowheight = 50)
 
 cal = Calendar(tableFrame, selectmode = "day", year = 2021, month = 6, day = 20, date_pattern = 'mm/dd/yy')
+#cal.grid(row = 0, column = 0, pady = 20, padx = 20)
 cal.pack(pady = 20)
 calToggle = True
 def toggleCalendar():
+    global calToggle
     if calToggle:
         cal.pack_forget()
+        calToggle = False
     else:
         cal.pack()
+        calToggle = True
 
 tb = Button(tableFrame, text = "Get date", command = toggleCalendar)
 tb.pack(pady = 20, ipadx = 20, ipady = 20)
