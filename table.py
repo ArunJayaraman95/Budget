@@ -4,6 +4,7 @@ from tkinter import messagebox
 import tkinter.font as font
 from tkinter import ttk
 import csv
+from tkcalendar import *
 
 # Define colors
 mainColor = "#70A0A2"
@@ -13,7 +14,7 @@ accentColor = "#57729E"
 buttonFont = ("Helvetica", 24)
 inputFont = ("Verdana", 20)
 usernameFont = ("Verdana", 16)
-
+aFont = ("Times New Roman", 20)
 def showFrame(frame):
     frame.tkraise()
 
@@ -46,20 +47,23 @@ activeUser = "test"
 
 # Create subframe
 viewFrame = Frame(tableFrame, bg = accentColor)
-
+viewFrame.place(height = 500, width = 1000, relx = 0.5, rely = 0.6, anchor = CENTER)
+viewFrame.config(highlightbackground='red', highlightthickness=4)
 # Labels
-testTree = ttk.Treeview(tableFrame)
+testTree = ttk.Treeview(viewFrame)
 
 # Define columns
-testTree['columns'] = ("Date", "Name", "Planned", "Actual", "Difference")
+testTree['columns'] = ("Date", "Name", "Planned", "Actual", "Difference", "Notes")
 
 # Format columns
 testTree.column("#0", width = 0, stretch = NO)
-testTree.column("Date", anchor = W)
-testTree.column("Name", anchor = W)
-testTree.column("Planned", anchor = E)
-testTree.column("Actual", anchor = E)
-testTree.column("Difference", anchor = E)
+testTree.column("Date", width = 80, anchor = W)
+testTree.column("Name", width = 120, anchor = W)
+testTree.column("Planned", width = 150, anchor = E)
+testTree.column("Actual", width = 150, anchor = E)
+testTree.column("Difference", width = 150, anchor = E)
+testTree.column("Notes", width = 350, anchor = E)
+
 
 
 #testTree.heading("#0", text = "Label", anchor = W)
@@ -68,26 +72,47 @@ testTree.heading("Name", text = "Name", anchor = CENTER)
 testTree.heading("Planned", text = "Planned", anchor = CENTER)
 testTree.heading("Actual", text = "Actual", anchor = CENTER)
 testTree.heading("Difference", text = "Difference", anchor = CENTER)
-#Add data
+testTree.heading("Notes", text = "Notes", anchor = CENTER)
+
+
 #testTree.insert(parent = '', index = 'end', iid = 0, text = "Parent", values = ("6/12", "Food", 300, 500))
 
+#Add data
 counter = 0
 with open('UserData/'+activeUser+'.csv', 'r') as file:
         reader = csv.reader(file)
         for line in reader:
             print(line)
-            diff = float(line[3]) - float(line[2])
-            diff = str('-$' + str(-diff)) if diff < 0 else '$' + str(diff) 
-            tempTuple = (line[0], line[1], '$' + line[2], '$' + line[3], diff)
+            diff = round(float(line[3]) - float(line[2]), 3)
+            diff = '-${:,.2f}'.format(-diff) if diff < 0 else '${:,.2f}'.format(diff) 
+            exp = '${:,.2f}'.format(float(line[2])) 
+            act = '${:,.2f}'.format(float(line[3])) 
+            tempTuple = (line[0], line[1], exp, act, diff, "")
             testTree.insert(parent = '', index = 'end', iid = counter, text = "Parent", values = tempTuple)
             counter += 1
 
 for i in range(40):
     testTree.insert(parent = '', index = 'end', iid = counter, text = "Parent", values = tempTuple)
     counter += 1
-testTree.pack(pady = 20)
+testTree.pack()
 vsb = ttk.Scrollbar(tableFrame, orient = 'vertical', command = testTree.yview)
 vsb.pack(side = 'right', fill = 'y')
+
+# Formatting (font changes)
+style = ttk.Style()
+style.configure("Treeview.Heading", font=(None, 12))
+style.configure("Treeview", font = ("Verdana", 16), rowheight = 50)
+
+cal = tkcalendar.Calendar(tableFrame, selectmode = "day", year = 2021, month = 6, day = 20)
+cal.pack(pady = 20)
+def grab_date():
+    tt.config(text =)
+
+tb = Button(tableFrame, text = "Get date", command = grab_date)
+
+tt = Label(tableFrame, text = "")
+tt.pack(pady = 20)
+
 #endregion
 
 
