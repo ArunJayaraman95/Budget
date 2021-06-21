@@ -90,7 +90,7 @@ def ext(date, name, planned, actual, notes = ""):
     b = name
     c = '${:,.2f}'.format(float(planned)) 
     d = '${:,.2f}'.format(float(actual)) 
-    e = round(float(line[2]) - float(line[3]), 2)
+    e = round(float(planned) - float(actual), 2)
     e = '-${:,.2f}'.format(-e) if e < 0 else '${:,.2f}'.format(e)
     if notes:
         f = notes
@@ -120,9 +120,9 @@ with open('UserData/'+activeUser+'.csv', 'r') as file:
 
 for i in range(40):
     if expenseCount % 2 == 0:
-        testTree.insert(parent = '', index = 'end', iid = expenseCount,values = ("d", "n", randint(0, 100), randint(0, 100), 4, ""), tags = ('evenrow'))
+        testTree.insert(parent = '', index = 'end', iid = expenseCount,values = ext("jdate", "jname", randint(0, 100), 30.493), tags = ('evenrow'))
     else:
-        testTree.insert(parent = '', index = 'end', iid = expenseCount, values = ("d", "n", randint(0, 100), randint(0, 2), 4, ""), tags = ('oddrow',))
+        testTree.insert(parent = '', index = 'end', iid = expenseCount, values = ext("jdate", "jname", randint(0, 200), randint(30, 240)), tags = ('oddrow',))
     expenseCount += 1
 
 # Pack table
@@ -156,7 +156,7 @@ for i, ent in enumerate(entryEditList):
 # Button functions
 def addExpense():
     global expenseCount
-    testTree.insert(parent = '', index = 'end', iid = expenseCount, values = (de.get(), ne.get(), pe.get(), ae.get(), float(pe.get()) - float(ae.get()), me.get()))
+    testTree.insert(parent = '', index = 'end', iid = expenseCount, values = ext(de.get(), ne.get(), pe.get(), ae.get(), me.get()))
     expenseCount += 1
     # Delete entries
     for col in entryEditList:
@@ -180,7 +180,6 @@ def selectExpense():
 
     # Get record values
     values = testTree.item(selected, 'values')
-    tempLabel.config(text=values[4])
     de.insert(0, values[0])
     ne.insert(0, values[1])
     pe.insert(0, values[2])
@@ -190,7 +189,7 @@ def selectExpense():
 def updateExpense():
     selected = testTree.focus()
     # Save new info
-    testTree.item(selected, text = "", values = (de.get(), ne.get(), pe.get(), ae.get(), float(pe.get()) - float(ae.get()), me.get()))
+    testTree.item(selected, text = "", values = ext(de.get(), ne.get(), pe.get(), ae.get(), me.get()))
 
 # Buttons
 addButton = Button(tableFrame, text = "Add expense", command = addExpense)
