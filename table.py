@@ -281,12 +281,6 @@ def openUpdateMenu():
     cancelAddButton = Button(utop, text = "Cancel", command = lambda: utop.destroy())
     cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 45, ipady = 20, pady = 10, sticky = W)
 
-#btn = Button(budgetFrame, text = "open", command = openAddMenu)
-#btn.grid(row = 0, column = 0)
-# Add panel
-
-
-
 
 def removeAll():
     for record in testTree.get_children():
@@ -322,27 +316,14 @@ def selectExpense():
 addButton = Button(tableFrame, text = "Add expense", command = openAddMenu, font = usernameFont, height = 4, width = 15)
 addButton.grid(row = 3, column = 0, pady = 20)
 addButton.config(bg = '#40c25c')
-#delButton = Button(tableFrame, text = "Remove all expenses", command = removeAll)
-#delButton.grid(row = 3, column = 1, pady = 20)
 
 updateButton = Button(tableFrame, text = "Edit Entry", font = usernameFont, command = openUpdateMenu, height = 4, width = 15)
 updateButton.grid(row = 3, column = 2, pady = 20)
 updateButton.config(bg = '#e0be36')
 
-
 removeButton = Button(tableFrame, text = "Delete Entry", font = usernameFont, command = removeSelected, height = 4, width = 15)
 removeButton.grid(row = 3, column = 4, pady = 20)
 removeButton.config(bg = '#d14232')
-
-#selectButton = Button(tableFrame, text = "Select Entry", command = selectExpense)
-#selectButton.grid(row = 3, column = 3, pady = 20)
-
-
-
-
-#removeOneEntry = Button(tableFrame, text = "Remove One", command = #removeOne)
-#def removeOne():
-#   testTree.delete(testTree.selection()[0])
 
 
 # Formatting (font changes)
@@ -352,35 +333,12 @@ style.configure("Treeview", font = ("Verdana", 16), rowheight = 50)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Calendar
-cal = Calendar(budgetFrame, selectmode = "day", year = 2021, month = 6, day = 20, date_pattern = 'mm/dd/yy')
+# KEEP THIS CALENDAR. FOR SOME REASON CODE GLITCHES W/O IT EVEN THOUGH IT'S NOT EVEN PACKED IN
+cal = Calendar(root)
 #cal.grid(row = 0, column = 0, pady = 20, padx = 20)
 #cal.pack(pady = 20)
-calToggle = True
 
-def toggleCalendar():
-    global calToggle
-    if calToggle:
-        cal.pack_forget()
-        calToggle = False
-    else:
-        cal.pack()
-        calToggle = True
+
 
 # Toggle Calendar button
 #tb = Button(budgetFrame, text = "Get date", command = toggleCalendar)
