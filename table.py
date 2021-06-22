@@ -51,7 +51,7 @@ tableFrame.place(height = 700, width = 1000, relx = 0.5, rely = 0.5, anchor = CE
 viewFrame = Frame(tableFrame, bg = accentColor)
 #viewFrame.place(height = 500, width = 1000, relx = 0.5, rely = 0.05, anchor = N)
 viewFrame.grid(row = 0, column = 0, columnspan = 5)
-viewFrame.config(highlightbackground='black', highlightthickness=4)
+viewFrame.config(highlightbackground='black', highlightthickness=0)
 
 # Scrollbar and table setup
 tableScroll = ttk.Scrollbar(viewFrame, orient = 'vertical')
@@ -153,6 +153,73 @@ entryEditList = [de, ne, pe, ae, me]
 for i, ent in enumerate(entryEditList):
     ent.grid(row = 2, column = i)
 '''
+
+def open():
+    top = Toplevel()
+    top.geometry("%dx%d" % (sx*.25, sy*0.6))
+    top.config(background = accentColor)
+    addCal = Calendar(top, selectmode = 'day', year = 2021, month = 6, day = 22, date_pattern = 'mm/dd/yy')
+    addCal.grid(row = 0, column = 0, pady = 20, padx = 20, columnspan = 2, rowspan = 3)
+
+    monthLabel= Label(top, text = "Month:", bg = accentColor)   
+    dayLabel = Label(top, text = "Day:", bg = accentColor)
+    yearLabel = Label(top, text = "Year:", bg = accentColor)
+   
+    monthLabel.grid(row = 0, column = 2, pady = 10, sticky = E)
+    dayLabel.grid(row = 1, column = 2, pady = 10, sticky = E)
+    yearLabel.grid(row = 2, column = 2, pady = 10, sticky = E)
+
+    monthEntry = Entry(top)
+    dayEntry = Entry(top)
+    yearEntry = Entry(top)
+
+    monthEntry.grid(row = 0, column = 3, pady = 10)
+    dayEntry.grid(row = 1, column = 3, pady = 10)
+    yearEntry.grid(row = 2, column = 3, pady = 10)
+    
+    nameLabel = Label(top, text = "Name:", bg = accentColor)
+    plannedLabel = Label(top, text = "Planned:", bg = accentColor)
+    actualLabel = Label(top, text = "Actual:", bg = accentColor)
+    notesLabel = Label(top, text = "Notes:", bg = accentColor)
+
+    nameLabel.grid(row = 3, column = 0, pady = 10)
+    plannedLabel.grid(row = 4, column = 0, pady = 10)
+    actualLabel.grid(row = 5, column = 0, pady = 10)
+    notesLabel.grid(row = 6, column = 0, pady = 10)
+
+    nameEntry = Entry(top)
+    plannedEntry = Entry(top)
+    actualEntry = Entry(top)
+    notesEntry = Entry(top)
+
+    nameEntry.grid(row = 3, column = 1, pady = 10)
+    plannedEntry.grid(row = 4, column = 1, pady = 10)
+    actualEntry.grid(row = 5, column = 1, pady = 10)
+    notesEntry.grid(row = 6, column = 1, pady = 10)
+
+    addEntryButton = Button(top, text = "Add Entry")
+    addEntryButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
+
+    cancelAddButton = Button(top, text = "Cancel")
+    cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
+
+
+
+btn = Button(budgetFrame, text = "open", command = open)
+btn.grid(row = 0, column = 0)
+# Add panel
+
+
+
+
+
+
+
+
+
+
+
+
 # Button functions
 def addExpense():
     global expenseCount
@@ -167,8 +234,10 @@ def removeAll():
         testTree.delete(record)
 
 def removeSelected():
-    for record in testTree.selection():
-        testTree.delete(record)
+    c = messagebox.askokcancel("Warning", "Are you sure you want to delete selected item(s)? (This cannot be undone)")
+    if c:
+        for record in testTree.selection():
+            testTree.delete(record)
 
 def selectExpense():
     # Clear entries
@@ -194,15 +263,18 @@ def updateExpense():
 # Buttons
 addButton = Button(tableFrame, text = "Add expense", command = addExpense, font = usernameFont, height = 4, width = 15)
 addButton.grid(row = 3, column = 0, pady = 20)
-
+addButton.config(bg = '#40c25c')
 #delButton = Button(tableFrame, text = "Remove all expenses", command = removeAll)
 #delButton.grid(row = 3, column = 1, pady = 20)
 
 updateButton = Button(tableFrame, text = "Edit Entry", font = usernameFont, command = updateExpense, height = 4, width = 15)
 updateButton.grid(row = 3, column = 2, pady = 20)
+updateButton.config(bg = '#e0be36')
+
 
 removeButton = Button(tableFrame, text = "Delete Entry", font = usernameFont, command = removeSelected, height = 4, width = 15)
 removeButton.grid(row = 3, column = 4, pady = 20)
+removeButton.config(bg = '#d14232')
 
 #selectButton = Button(tableFrame, text = "Select Entry", command = selectExpense)
 #selectButton.grid(row = 3, column = 3, pady = 20)
