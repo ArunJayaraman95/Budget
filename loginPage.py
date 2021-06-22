@@ -32,7 +32,8 @@ registerFrame = Frame(root, background = mainColor)
 for frame in (loginFrame, registerFrame):
     frame.grid(row = 0, column = 0, sticky = "nsew")
 
-showFrame(registerFrame)
+# Starting frame
+showFrame(loginFrame)
 
 sx = root.winfo_screenwidth() 
 sy = root.winfo_screenheight()
