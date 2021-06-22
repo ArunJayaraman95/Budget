@@ -117,14 +117,14 @@ with open('UserData/'+activeUser+'.csv', 'r') as file:
             else:
                 testTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('oddrow',))
             expenseCount += 1
-
+'''
 for i in range(40):
     if expenseCount % 2 == 0:
         testTree.insert(parent = '', index = 'end', iid = expenseCount,values = ext("jdate", "jname", randint(0, 100), 30.493), tags = ('evenrow'))
     else:
         testTree.insert(parent = '', index = 'end', iid = expenseCount, values = ext("jdate", "jname", randint(0, 200), randint(30, 240)), tags = ('oddrow',))
     expenseCount += 1
-
+'''
 # Pack table
 testTree.pack()
 
@@ -217,15 +217,15 @@ def openAddMenu():
     addEntryButton = Button(top, text = "Add Entry", command = addExpense)
     addEntryButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
 
-    cancelAddButton = Button(top, text = "Cancel")
+    cancelAddButton = Button(top, text = "Cancel", command = lambda: top.destroy())
     cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
-'''
+
 def updateExpense():
     selected = testTree.focus()
     date = umonthEntry.get() + "/" + udayEntry.get() + "/" + uyearEntry.get()
     print(selected)
     # Save new info
-    testTree.item(selected, text = "", values = ext(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
+    testTree.item(selected, text = "", values = ext(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get()))
     
 def openUpdateMenu():
     utop = Toplevel()
@@ -275,12 +275,12 @@ def openUpdateMenu():
 
 
     
-    updateButton = Button(utop, text = "Add Entry", command = updateExpense)
-    updateButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
+    updateButton = Button(utop, text = "Update Entry", command = updateExpense)
+    updateButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = W)
 
-    cancelAddButton = Button(utop, text = "Cancel")
-    cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
-'''
+    cancelAddButton = Button(utop, text = "Cancel", command = lambda: utop.destroy())
+    cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 45, ipady = 20, pady = 10, sticky = W)
+
 #btn = Button(budgetFrame, text = "open", command = openAddMenu)
 #btn.grid(row = 0, column = 0)
 # Add panel
@@ -293,10 +293,12 @@ def removeAll():
         testTree.delete(record)
 
 def removeSelected():
+    global expenseCount
     c = messagebox.askokcancel("Warning", "Are you sure you want to delete selected item(s)? (This cannot be undone)")
     if c:
         for record in testTree.selection():
             testTree.delete(record)
+            expenseCount -= 1
 
 def selectExpense():
     # Clear entries
@@ -323,7 +325,7 @@ addButton.config(bg = '#40c25c')
 #delButton = Button(tableFrame, text = "Remove all expenses", command = removeAll)
 #delButton.grid(row = 3, column = 1, pady = 20)
 
-updateButton = Button(tableFrame, text = "Edit Entry", font = usernameFont, height = 4, width = 15)
+updateButton = Button(tableFrame, text = "Edit Entry", font = usernameFont, command = openUpdateMenu, height = 4, width = 15)
 updateButton.grid(row = 3, column = 2, pady = 20)
 updateButton.config(bg = '#e0be36')
 
