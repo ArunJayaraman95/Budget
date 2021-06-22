@@ -153,13 +153,28 @@ entryEditList = [de, ne, pe, ae, me]
 for i, ent in enumerate(entryEditList):
     ent.grid(row = 2, column = i)
 '''
+# Button functions
+def addExpense():
+    global expenseCount
+    date = monthEntry.get() + "/" + dayEntry.get() + "/" + yearEntry.get()
+    testTree.insert(parent = '', index = 'end', iid = expenseCount, values = ext(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
+    expenseCount += 1
+    # Delete entries
+    #for col in entryEditList:
+    #    col.delete(0, END)
 
-def open():
+
+
+
+def openAddMenu():
     top = Toplevel()
     top.geometry("%dx%d" % (sx*.25, sy*0.6))
     top.config(background = accentColor)
     addCal = Calendar(top, selectmode = 'day', year = 2021, month = 6, day = 22, date_pattern = 'mm/dd/yy')
     addCal.grid(row = 0, column = 0, pady = 20, padx = 20, columnspan = 2, rowspan = 3)
+
+    global monthEntry, dayEntry, yearEntry
+    global nameEntry, plannedEntry, actualEntry, notesEntry
 
     monthLabel= Label(top, text = "Month:", bg = accentColor)   
     dayLabel = Label(top, text = "Day:", bg = accentColor)
@@ -197,37 +212,81 @@ def open():
     actualEntry.grid(row = 5, column = 1, pady = 10)
     notesEntry.grid(row = 6, column = 1, pady = 10)
 
-    addEntryButton = Button(top, text = "Add Entry")
+
+    
+    addEntryButton = Button(top, text = "Add Entry", command = addExpense)
     addEntryButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
 
     cancelAddButton = Button(top, text = "Cancel")
     cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
+'''
+def updateExpense():
+    selected = testTree.focus()
+    date = umonthEntry.get() + "/" + udayEntry.get() + "/" + uyearEntry.get()
+    print(selected)
+    # Save new info
+    testTree.item(selected, text = "", values = ext(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
+    
+def openUpdateMenu():
+    utop = Toplevel()
+    utop.geometry("%dx%d" % (sx*.25, sy*0.6))
+    utop.config(background = accentColor)
+    addCal = Calendar(utop, selectmode = 'day', year = 2021, month = 6, day = 22, date_pattern = 'mm/dd/yy')
+    addCal.grid(row = 0, column = 0, pady = 20, padx = 20, columnspan = 2, rowspan = 3)
+
+    global umonthEntry, udayEntry, uyearEntry
+    global unameEntry, uplannedEntry, uactualEntry, unotesEntry
+
+    monthLabel= Label(utop, text = "Month:", bg = accentColor)   
+    dayLabel = Label(utop, text = "Day:", bg = accentColor)
+    yearLabel = Label(utop, text = "Year:", bg = accentColor)
+   
+    monthLabel.grid(row = 0, column = 2, pady = 10, sticky = E)
+    dayLabel.grid(row = 1, column = 2, pady = 10, sticky = E)
+    yearLabel.grid(row = 2, column = 2, pady = 10, sticky = E)
+
+    umonthEntry = Entry(utop)
+    udayEntry = Entry(utop)
+    uyearEntry = Entry(utop)
+
+    umonthEntry.grid(row = 0, column = 3, pady = 10)
+    udayEntry.grid(row = 1, column = 3, pady = 10)
+    uyearEntry.grid(row = 2, column = 3, pady = 10)
+    
+    nameLabel = Label(utop, text = "Name:", bg = accentColor)
+    plannedLabel = Label(utop, text = "Planned:", bg = accentColor)
+    actualLabel = Label(utop, text = "Actual:", bg = accentColor)
+    notesLabel = Label(utop, text = "Notes:", bg = accentColor)
+
+    nameLabel.grid(row = 3, column = 0, pady = 10)
+    plannedLabel.grid(row = 4, column = 0, pady = 10)
+    actualLabel.grid(row = 5, column = 0, pady = 10)
+    notesLabel.grid(row = 6, column = 0, pady = 10)
+
+    unameEntry = Entry(utop)
+    uplannedEntry = Entry(utop)
+    uactualEntry = Entry(utop)
+    unotesEntry = Entry(utop)
+
+    unameEntry.grid(row = 3, column = 1, pady = 10)
+    uplannedEntry.grid(row = 4, column = 1, pady = 10)
+    uactualEntry.grid(row = 5, column = 1, pady = 10)
+    unotesEntry.grid(row = 6, column = 1, pady = 10)
 
 
+    
+    updateButton = Button(utop, text = "Add Entry", command = updateExpense)
+    updateButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
 
-btn = Button(budgetFrame, text = "open", command = open)
-btn.grid(row = 0, column = 0)
+    cancelAddButton = Button(utop, text = "Cancel")
+    cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
+'''
+#btn = Button(budgetFrame, text = "open", command = openAddMenu)
+#btn.grid(row = 0, column = 0)
 # Add panel
 
 
 
-
-
-
-
-
-
-
-
-
-# Button functions
-def addExpense():
-    global expenseCount
-    testTree.insert(parent = '', index = 'end', iid = expenseCount, values = ext(de.get(), ne.get(), pe.get(), ae.get(), me.get()))
-    expenseCount += 1
-    # Delete entries
-    for col in entryEditList:
-        col.delete(0, END)
 
 def removeAll():
     for record in testTree.get_children():
@@ -255,19 +314,16 @@ def selectExpense():
     ae.insert(0, values[3][1:])
     me.insert(0, values[5])
 
-def updateExpense():
-    selected = testTree.focus()
-    # Save new info
-    testTree.item(selected, text = "", values = ext(de.get(), ne.get(), pe.get(), ae.get(), me.get()))
+
 
 # Buttons
-addButton = Button(tableFrame, text = "Add expense", command = addExpense, font = usernameFont, height = 4, width = 15)
+addButton = Button(tableFrame, text = "Add expense", command = openAddMenu, font = usernameFont, height = 4, width = 15)
 addButton.grid(row = 3, column = 0, pady = 20)
 addButton.config(bg = '#40c25c')
 #delButton = Button(tableFrame, text = "Remove all expenses", command = removeAll)
 #delButton.grid(row = 3, column = 1, pady = 20)
 
-updateButton = Button(tableFrame, text = "Edit Entry", font = usernameFont, command = updateExpense, height = 4, width = 15)
+updateButton = Button(tableFrame, text = "Edit Entry", font = usernameFont, height = 4, width = 15)
 updateButton.grid(row = 3, column = 2, pady = 20)
 updateButton.config(bg = '#e0be36')
 
