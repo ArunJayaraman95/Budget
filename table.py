@@ -117,6 +117,8 @@ with open('UserData/'+activeUser+'.csv', 'r') as file:
             else:
                 testTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('oddrow',))
             expenseCount += 1
+
+# JUNK DATA
 '''
 for i in range(40):
     if expenseCount % 2 == 0:
@@ -125,6 +127,9 @@ for i in range(40):
         testTree.insert(parent = '', index = 'end', iid = expenseCount, values = ext("jdate", "jname", randint(0, 200), randint(30, 240)), tags = ('oddrow',))
     expenseCount += 1
 '''
+
+
+
 # Pack table
 testTree.pack()
 
@@ -162,8 +167,6 @@ def addExpense():
     # Delete entries
     #for col in entryEditList:
     #    col.delete(0, END)
-
-
 
 
 def openAddMenu():
@@ -212,31 +215,32 @@ def openAddMenu():
     actualEntry.grid(row = 5, column = 1, pady = 10)
     notesEntry.grid(row = 6, column = 1, pady = 10)
 
-
-    
     addEntryButton = Button(top, text = "Add Entry", command = addExpense)
     addEntryButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
 
     cancelAddButton = Button(top, text = "Cancel", command = lambda: top.destroy())
     cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
 
+
 def updateExpense():
     selected = testTree.focus()
-    date = umonthEntry.get() + "/" + udayEntry.get() + "/" + uyearEntry.get()
+    date = umonthEntry + "/" + udayEntry + "/" + uyearEntry
     print(selected)
     # Save new info
     testTree.item(selected, text = "", values = ext(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get()))
     
+
 def openUpdateMenu():
     utop = Toplevel()
     utop.geometry("%dx%d" % (sx*.25, sy*0.6))
     utop.config(background = accentColor)
-    addCal = Calendar(utop, selectmode = 'day', year = 2021, month = 6, day = 22, date_pattern = 'mm/dd/yy')
-    addCal.grid(row = 0, column = 0, pady = 20, padx = 20, columnspan = 2, rowspan = 3)
+    updCal = Calendar(utop, selectmode = 'day', year = 2021, month = 6, day = 22, date_pattern = 'mm/dd/yyyy')
+    updCal.grid(row = 0, column = 0, pady = 20, padx = 20, columnspan = 2, rowspan = 3)
 
     global umonthEntry, udayEntry, uyearEntry
     global unameEntry, uplannedEntry, uactualEntry, unotesEntry
 
+    '''
     monthLabel= Label(utop, text = "Month:", bg = accentColor)   
     dayLabel = Label(utop, text = "Day:", bg = accentColor)
     yearLabel = Label(utop, text = "Year:", bg = accentColor)
@@ -252,7 +256,25 @@ def openUpdateMenu():
     umonthEntry.grid(row = 0, column = 3, pady = 10)
     udayEntry.grid(row = 1, column = 3, pady = 10)
     uyearEntry.grid(row = 2, column = 3, pady = 10)
-    
+    '''
+
+    selDateLabel = Label(utop, text = "Selected Date: __/__/__", bg = accentColor)
+    selDateLabel.grid(row = 1, column = 2, columnspan = 2, pady = 10, sticky = E)
+
+
+    def grabDate():
+        global umonthEntry, udayEntry, uyearEntry
+        selectedDate = updCal.get_date()
+        selDateLabel.config(text = selectedDate)
+        umonthEntry = selectedDate[:2]
+        udayEntry = selectedDate[3:6]
+        uyearEntry = selectedDate[-4:]
+
+
+
+    getDateButton = Button(utop, text = "Use this date", command = grabDate)
+    getDateButton.grid(row = 0, column = 2, rowspan = 2, columnspan = 2)
+
     nameLabel = Label(utop, text = "Name:", bg = accentColor)
     plannedLabel = Label(utop, text = "Planned:", bg = accentColor)
     actualLabel = Label(utop, text = "Actual:", bg = accentColor)
@@ -273,8 +295,6 @@ def openUpdateMenu():
     uactualEntry.grid(row = 5, column = 1, pady = 10)
     unotesEntry.grid(row = 6, column = 1, pady = 10)
 
-
-    
     updateButton = Button(utop, text = "Update Entry", command = updateExpense)
     updateButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = W)
 
@@ -286,6 +306,7 @@ def removeAll():
     for record in testTree.get_children():
         testTree.delete(record)
 
+
 def removeSelected():
     global expenseCount
     c = messagebox.askokcancel("Warning", "Are you sure you want to delete selected item(s)? (This cannot be undone)")
@@ -293,6 +314,7 @@ def removeSelected():
         for record in testTree.selection():
             testTree.delete(record)
             expenseCount -= 1
+
 
 def selectExpense():
     # Clear entries
