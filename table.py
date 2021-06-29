@@ -286,8 +286,8 @@ def export():
         for d, n, p, a, m in reader:
             s1.write(rnum, cnum + 1, d)
             s1.write(rnum, cnum + 2, n)
-            s1.write(rnum, cnum + 3, p)
-            s1.write(rnum, cnum + 4, a)
+            s1.write(rnum, cnum + 3, float(p))
+            s1.write(rnum, cnum + 4, float(a))
             s1.write(rnum, cnum + 5, float(p)-float(a))
             s1.write(rnum, cnum + 6, m)
             rnum += 1
