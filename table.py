@@ -67,12 +67,12 @@ testTree['columns'] = ("Date", "Name", "Planned", "Actual", "Difference", "Notes
 
 # Format columns
 testTree.column("#0", width = 0, stretch = NO)
-testTree.column("Date", width = 80, anchor = W)
+testTree.column("Date", width = 140, anchor = W)
 testTree.column("Name", width = 120, anchor = W)
 testTree.column("Planned", width = 150, anchor = E)
 testTree.column("Actual", width = 150, anchor = E)
 testTree.column("Difference", width = 150, anchor = E)
-testTree.column("Notes", width = 330, anchor = E)
+testTree.column("Notes", width = 270, anchor = E)
 
 #testTree.heading("#0", text = "Label", anchor = W)
 testTree.heading("Date", text = "Date", anchor = CENTER)
@@ -270,7 +270,7 @@ def deleteExpense():
             testTree.delete(record)
             expenseCount -= 1
     updateData()
-    
+
 def export():
     newXS = xw.Workbook('HELLO THERE.xlsx')
     s1 = newXS.add_worksheet('Current Month')
