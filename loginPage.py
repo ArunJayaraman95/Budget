@@ -2,7 +2,8 @@
 from tkinter import *
 from tkinter import messagebox
 import tkinter.font as font
-from PIL import ImageTk, Image
+import re
+#from PIL import ImageTk, Image
 import csv
 
 # Define colors
@@ -109,17 +110,46 @@ registerButton.grid(row = 5, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
 #endregion
 
+# Strong Password Check Function
+#####################################################################################################
+
+
+def uppercase_check(passEntry):
+    if re.search('[A-Z]', passEntry): #atleast one uppercase character
+        return True
+    return False
+
+def lowercase_check(passEntry):
+    if re.search('[a-z]', passEntry): #atleast one lowercase character
+        return True
+    return False
+
+def digit_check(passEntry):
+    if re.search('[0-9]', passEntry): #atleast one digit
+        return True
+    return False
+
+def spCr_check(passEntry):
+    if re.search('[_@$!#%&?/\-]', passEntry): #atleast one digit
+        return True
+    return False
+
+
+
+#####################################################################################################
+
 # ===============Frame 2=====================#
 
 # Functions
 def registerAccount():
     print("Register account clicked")
+
     # Store entries
     userEntry = urInput.get()
     passEntry = prInput.get()
     confEntry = pcInput.get()
-
     foundFlag = False
+
     # Check username
     with open('UserData/userList.csv', 'r') as file:
         reader = csv.reader(file)
@@ -127,21 +157,31 @@ def registerAccount():
             print(line)
             if line[0].lower().strip() == userEntry.lower():
                 print("User already exists")
+                messagebox.showwarning("Error", "User already exists")
                 foundFlag = True
-    if not foundFlag:
-        if passEntry != confEntry:
-            messagebox.showwarning("Error", "Passwords don't match")
-        else:
-            with open ('UserData/userList.csv', 'a') as file:
-                writer = csv.writer(file, lineterminator="\n")
-                writer.writerow([userEntry, passEntry])
-            print("User ", userEntry, "added!")
-            messagebox.showinfo("Success!", "User added!")
-            
+                
 
+        if not foundFlag:
+                #messagebox.showwarning("Password", "Must be in \n 1) Minimum 8 characters.\n 2) The alphabets must be between [a-z].\n 3) At least one alphabet should be of Upper Case [A-Z].\n 4) At least 1 number or digit between [0-9].")
+            if passEntry != confEntry:
+                messagebox.showerror("Error", "Passwords don't match")
+
+            elif len(passEntry) >= 8 and uppercase_check(passEntry) and lowercase_check(passEntry) and digit_check(passEntry) and spCr_check(passEntry) :
+                messagebox.showinfo("Excelent", "Your password is strong")
+                with open ('UserData/userList.csv', 'a') as file:
+                    writer = csv.writer(file, lineterminator="\n")
+                    writer.writerow([userEntry, passEntry])
+                print("User ", userEntry, "added!")
+                messagebox.showinfo("Success!", "User is added successfully!")  
+            else:
+                messagebox.showwarning("Warning!", "Password is weak \n Password Must be in \n 1). Minimum 8 characters.\n 2). The alphabets must be between [a-z].\n 3). At least one alphabet should be of Upper Case [A-Z].\n 4). At least 1 number or digit between [0-9].\n 5). At least 1 special character ")
+                
+    
     urInput.delete(0, END)
     prInput.delete(0, END)
     pcInput.delete(0, END)
+
+
 
 widthAdjuster2 = 0.37
 heightAdjuster2 = 0.2
