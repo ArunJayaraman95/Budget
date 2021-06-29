@@ -161,7 +161,7 @@ for i, ent in enumerate(entryEditList):
 # Button functions
 def addExpense():
     global expenseCount
-    date = monthEntry.get() + "/" + dayEntry.get() + "/" + yearEntry.get()
+    date = monthEntry + "/" + dayEntry + "/" + yearEntry
     testTree.insert(parent = '', index = 'end', iid = expenseCount, values = ext(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
     expenseCount += 1
     # Delete entries
@@ -178,7 +178,8 @@ def openAddMenu():
 
     global monthEntry, dayEntry, yearEntry
     global nameEntry, plannedEntry, actualEntry, notesEntry
-
+    
+    '''
     monthLabel= Label(top, text = "Month:", bg = accentColor)   
     dayLabel = Label(top, text = "Day:", bg = accentColor)
     yearLabel = Label(top, text = "Year:", bg = accentColor)
@@ -194,7 +195,25 @@ def openAddMenu():
     monthEntry.grid(row = 0, column = 3, pady = 10)
     dayEntry.grid(row = 1, column = 3, pady = 10)
     yearEntry.grid(row = 2, column = 3, pady = 10)
+    '''
     
+    selDateLabel = Label(top, text = "Selected Date: __/__/__", bg = accentColor)
+    selDateLabel.grid(row = 1, column = 2, columnspan = 2, pady = 10, sticky = E)
+
+
+    def grabDate():
+        global monthEntry, dayEntry, yearEntry
+        selectedDate = addCal.get_date()
+        selDateLabel.config(text = selectedDate)
+        monthEntry = selectedDate[:2]
+        dayEntry = selectedDate[3:6]
+        yearEntry = selectedDate[-4:]
+
+
+
+    getDateButton = Button(top, text = "Use this date", command = grabDate)
+    getDateButton.grid(row = 0, column = 2, rowspan = 2, columnspan = 2)
+
     nameLabel = Label(top, text = "Name:", bg = accentColor)
     plannedLabel = Label(top, text = "Planned:", bg = accentColor)
     actualLabel = Label(top, text = "Actual:", bg = accentColor)
