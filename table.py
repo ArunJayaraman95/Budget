@@ -46,6 +46,7 @@ showFrame(budgetFrame)
 
 # Variables
 activeUser = "test"
+entries = []
 
 tableFrame = Frame(budgetFrame, background = accentColor)
 tableFrame.place(height = 700, width = 1000, relx = 0.5, rely = 0.5, anchor = CENTER)
@@ -99,13 +100,14 @@ def ext(date, name, planned, actual, notes = ""):
     return (a, b, c, d, e, f)
 
 
-#Add data
+
+#Read in csv data
 expenseCount = 0
 with open('UserData/'+activeUser+'.csv', 'r') as file:
         reader = csv.reader(file)
         for line in reader:
             print(line)
-            tempTuple = ext(line[0], line[1], line[2], line[3])
+            tempTuple = ext(line[0], line[1], line[2], line[3], line[4])
             if expenseCount % 2 == 0:
                 testTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('evenrow',))
             else:
@@ -137,6 +139,7 @@ def addExpense():
         cWriter = csv.writer(cFile, delimiter=',')
         print(date)
         cWriter.writerow([date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()])
+    updateData()
     # Delete entries
     #for col in entryEditList:
     #    col.delete(0, END)
@@ -202,7 +205,8 @@ def updateExpense():
     print(selected)
     # Save new info
     testTree.item(selected, text = "", values = ext(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get()))
-    
+    updateData()
+
 
 def openUpdateMenu():
     utop = Toplevel()
@@ -223,7 +227,7 @@ def openUpdateMenu():
         selectedDate = updCal.get_date()
         selDateLabel.config(text = selectedDate)
         umonthEntry = selectedDate[:2]
-        udayEntry = selectedDate[3:6]
+        udayEntry = selectedDate[3:5]
         uyearEntry = selectedDate[-4:]
 
 
@@ -258,14 +262,15 @@ def openUpdateMenu():
     cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 45, ipady = 20, pady = 10, sticky = W)
 
 
-def removeSelected():
+def deleteExpense():
     global expenseCount
     c = messagebox.askokcancel("Warning", "Are you sure you want to delete selected item(s)? (This cannot be undone)")
     if c:
         for record in testTree.selection():
             testTree.delete(record)
             expenseCount -= 1
-
+    updateData()
+    
 def export():
     newXS = xw.Workbook('HELLO THERE.xlsx')
     s1 = newXS.add_worksheet('Current Month')
@@ -292,13 +297,19 @@ def export():
             s1.write(rnum, cnum + 6, m)
             rnum += 1
     newXS.close()
+    print(entries)
 
 
-''' 
-def removeAll():
-    for record in testTree.get_children():
-        testTree.delete(record)
-'''
+def updateData():
+    with open('UserData/' + activeUser + '.csv', 'w', newline = '') as uFile:
+        cWriter = csv.writer(uFile, delimiter = ',')
+        for record in testTree.get_children():
+            t = testTree.item(record)['values']
+            temp = [t[0], t[1], str(t[2]).replace('$', '').replace(',',''), str(t[3]).replace('$','').replace(',',''), t[5]]
+            
+            cWriter.writerow(temp)
+            #cWriter.writerow(testTree.item(record)['values'].replace('$', ''))
+    uFile.close()
 
 # Main Entry Buttons
 addButton = Button(tableFrame, text = "Add expense", command = openAddMenu, font = usernameFont, height = 4, width = 15)
@@ -309,7 +320,7 @@ updateButton = Button(tableFrame, text = "Edit Entry", font = usernameFont, comm
 updateButton.grid(row = 3, column = 2, pady = 20)
 updateButton.config(bg = '#e0be36')
 
-removeButton = Button(tableFrame, text = "Delete Entry", font = usernameFont, command = removeSelected, height = 4, width = 15)
+removeButton = Button(tableFrame, text = "Delete Entry", font = usernameFont, command = deleteExpense, height = 4, width = 15)
 removeButton.grid(row = 3, column = 4, pady = 20)
 removeButton.config(bg = '#d14232')
 
