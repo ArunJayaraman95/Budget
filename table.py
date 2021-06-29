@@ -6,6 +6,7 @@ from tkinter import ttk
 import csv
 from tkcalendar import *
 from random import randint
+
 # Define colors
 mainColor = "#70A0A2"
 accentColor = "#57729E"
@@ -33,7 +34,6 @@ root.iconbitmap("img/WayneStateLogo.ico")
 root.rowconfigure(0, weight = 1)
 root.columnconfigure(0, weight = 1)
 
-
 budgetFrame = Frame(root, background = mainColor)
 budgetFrame.grid(row = 0, column = 0, sticky = "nsew")
 
@@ -42,6 +42,7 @@ showFrame(budgetFrame)
 
 #region Frame1
 #============Frame 1 ==============# 
+
 # Variables
 activeUser = "test"
 
@@ -71,8 +72,6 @@ testTree.column("Actual", width = 150, anchor = E)
 testTree.column("Difference", width = 150, anchor = E)
 testTree.column("Notes", width = 330, anchor = E)
 
-
-
 #testTree.heading("#0", text = "Label", anchor = W)
 testTree.heading("Date", text = "Date", anchor = CENTER)
 testTree.heading("Name", text = "Name", anchor = CENTER)
@@ -99,18 +98,12 @@ def ext(date, name, planned, actual, notes = ""):
     return (a, b, c, d, e, f)
 
 
-
 #Add data
 expenseCount = 0
 with open('UserData/'+activeUser+'.csv', 'r') as file:
         reader = csv.reader(file)
         for line in reader:
             print(line)
-            #diff = round(float(line[3]) - float(line[2]), 2)
-            #diff = '-${:,.2f}'.format(-diff) if diff < 0 else '${:,.2f}'.format(diff) 
-            #exp = '${:,.2f}'.format(float(line[2])) 
-            #act = '${:,.2f}'.format(float(line[3])) 
-            #tempTuple = (line[0], line[1], exp, act, diff, "")
             tempTuple = ext(line[0], line[1], line[2], line[3])
             if expenseCount % 2 == 0:
                 testTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('evenrow',))
@@ -129,35 +122,10 @@ for i in range(40):
 '''
 
 
-
 # Pack table
 testTree.pack()
 
-# Table editor
-'''
-dl = Label(tableFrame, text = "Date")
-nl = Label(tableFrame, text = "Name")
-pl = Label(tableFrame, text = "Planned")
-al = Label(tableFrame, text = "Actual")
-ml = Label(tableFrame, text = "Notes")
 
-columnList = [dl, nl, pl, al, ml]
-
-for i, col in enumerate(columnList):
-    col.grid(row = 1, column = i, pady = 20)
-    col.config(bg = accentColor)
-
-# Entry boxes to edit
-de = Entry(tableFrame)
-ne = Entry(tableFrame)
-pe = Entry(tableFrame)
-ae = Entry(tableFrame)
-me = Entry(tableFrame)
-
-entryEditList = [de, ne, pe, ae, me]
-for i, ent in enumerate(entryEditList):
-    ent.grid(row = 2, column = i)
-'''
 # Button functions
 def addExpense():
     global expenseCount
@@ -178,24 +146,6 @@ def openAddMenu():
 
     global monthEntry, dayEntry, yearEntry
     global nameEntry, plannedEntry, actualEntry, notesEntry
-    
-    '''
-    monthLabel= Label(top, text = "Month:", bg = accentColor)   
-    dayLabel = Label(top, text = "Day:", bg = accentColor)
-    yearLabel = Label(top, text = "Year:", bg = accentColor)
-   
-    monthLabel.grid(row = 0, column = 2, pady = 10, sticky = E)
-    dayLabel.grid(row = 1, column = 2, pady = 10, sticky = E)
-    yearLabel.grid(row = 2, column = 2, pady = 10, sticky = E)
-
-    monthEntry = Entry(top)
-    dayEntry = Entry(top)
-    yearEntry = Entry(top)
-
-    monthEntry.grid(row = 0, column = 3, pady = 10)
-    dayEntry.grid(row = 1, column = 3, pady = 10)
-    yearEntry.grid(row = 2, column = 3, pady = 10)
-    '''
     
     selDateLabel = Label(top, text = "Selected Date: __/__/__", bg = accentColor)
     selDateLabel.grid(row = 1, column = 2, columnspan = 2, pady = 10, sticky = E)
@@ -259,24 +209,6 @@ def openUpdateMenu():
     global umonthEntry, udayEntry, uyearEntry
     global unameEntry, uplannedEntry, uactualEntry, unotesEntry
 
-    '''
-    monthLabel= Label(utop, text = "Month:", bg = accentColor)   
-    dayLabel = Label(utop, text = "Day:", bg = accentColor)
-    yearLabel = Label(utop, text = "Year:", bg = accentColor)
-   
-    monthLabel.grid(row = 0, column = 2, pady = 10, sticky = E)
-    dayLabel.grid(row = 1, column = 2, pady = 10, sticky = E)
-    yearLabel.grid(row = 2, column = 2, pady = 10, sticky = E)
-
-    umonthEntry = Entry(utop)
-    udayEntry = Entry(utop)
-    uyearEntry = Entry(utop)
-
-    umonthEntry.grid(row = 0, column = 3, pady = 10)
-    udayEntry.grid(row = 1, column = 3, pady = 10)
-    uyearEntry.grid(row = 2, column = 3, pady = 10)
-    '''
-
     selDateLabel = Label(utop, text = "Selected Date: __/__/__", bg = accentColor)
     selDateLabel.grid(row = 1, column = 2, columnspan = 2, pady = 10, sticky = E)
 
@@ -321,11 +253,6 @@ def openUpdateMenu():
     cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 45, ipady = 20, pady = 10, sticky = W)
 
 
-def removeAll():
-    for record in testTree.get_children():
-        testTree.delete(record)
-
-
 def removeSelected():
     global expenseCount
     c = messagebox.askokcancel("Warning", "Are you sure you want to delete selected item(s)? (This cannot be undone)")
@@ -335,23 +262,11 @@ def removeSelected():
             expenseCount -= 1
 
 
-def selectExpense():
-    # Clear entries
-    for col in entryEditList:
-        col.delete(0, END)
-
-    # Get record id
-    selected = testTree.focus()
-
-    # Get record values
-    values = testTree.item(selected, 'values')
-    de.insert(0, values[0])
-    ne.insert(0, values[1])
-    pe.insert(0, values[2][1:])
-    ae.insert(0, values[3][1:])
-    me.insert(0, values[5])
-
-
+'''
+def removeAll():
+    for record in testTree.get_children():
+        testTree.delete(record)
+'''
 
 # Buttons
 addButton = Button(tableFrame, text = "Add expense", command = openAddMenu, font = usernameFont, height = 4, width = 15)
@@ -373,22 +288,9 @@ style.configure("Treeview.Heading", font=(None, 12))
 style.configure("Treeview", font = ("Verdana", 16), rowheight = 50)
 
 
-
 # KEEP THIS CALENDAR. FOR SOME REASON CODE GLITCHES W/O IT EVEN THOUGH IT'S NOT EVEN PACKED IN
 cal = Calendar(root)
-#cal.grid(row = 0, column = 0, pady = 20, padx = 20)
-#cal.pack(pady = 20)
-
-
-
-# Toggle Calendar button
-#tb = Button(budgetFrame, text = "Get date", command = toggleCalendar)
-#tb.pack(pady = 20, ipadx = 20, ipady = 20)
-
-#
-
 
 #endregion
-
 
 root.mainloop()
