@@ -133,6 +133,10 @@ def addExpense():
     date = monthEntry + "/" + dayEntry + "/" + yearEntry
     testTree.insert(parent = '', index = 'end', iid = expenseCount, values = ext(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
     expenseCount += 1
+    with open('UserData/' + activeUser + '.csv', 'a', newline = '') as cFile:
+        cWriter = csv.writer(cFile, delimiter=',')
+        print(date)
+        cWriter.writerow([date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()])
     # Delete entries
     #for col in entryEditList:
     #    col.delete(0, END)
@@ -142,7 +146,7 @@ def openAddMenu():
     top = Toplevel()
     top.geometry("%dx%d" % (sx*.25, sy*0.6))
     top.config(background = accentColor)
-    addCal = Calendar(top, selectmode = 'day', year = 2021, month = 6, day = 22, date_pattern = 'mm/dd/yy')
+    addCal = Calendar(top, selectmode = 'day', year = 2021, month = 6, day = 22, date_pattern = 'mm/dd/yyyy')
     addCal.grid(row = 0, column = 0, pady = 20, padx = 20, columnspan = 2, rowspan = 3)
 
     global monthEntry, dayEntry, yearEntry
@@ -157,7 +161,7 @@ def openAddMenu():
         selectedDate = addCal.get_date()
         selDateLabel.config(text = selectedDate)
         monthEntry = selectedDate[:2]
-        dayEntry = selectedDate[3:6]
+        dayEntry = selectedDate[3:5]
         yearEntry = selectedDate[-4:]
 
 
