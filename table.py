@@ -6,6 +6,7 @@ from tkinter import ttk
 import csv
 from tkcalendar import *
 from random import randint
+import xlsxwriter as xw
 
 # Define colors
 mainColor = "#70A0A2"
@@ -261,14 +262,41 @@ def removeSelected():
             testTree.delete(record)
             expenseCount -= 1
 
+def export():
+    newXS = xw.Workbook('HELLO THERE.xlsx')
+    s1 = newXS.add_worksheet('Current Month')
+    rnum = 1
+    cnum = 0
+    messagebox.showinfo("File Alert", "Excel file has been created!")
 
-'''
+    bold = newXS.add_format({'bold': True})
+    s1.write(rnum, cnum + 1, "Date", bold)
+    s1.write(rnum, cnum + 2, "Name", bold)
+    s1.write(rnum, cnum + 3, "Planned", bold)
+    s1.write(rnum, cnum + 4, "Actual", bold)
+    s1.write(rnum, cnum + 5, "Difference", bold)
+    s1.write(rnum, cnum + 6, "Notes", bold)
+    rnum += 1
+    with open('UserData/'+activeUser+'.csv', 'r') as file:
+        reader = csv.reader(file)
+        for d, n, p, a, m in reader:
+            s1.write(rnum, cnum + 1, d)
+            s1.write(rnum, cnum + 2, n)
+            s1.write(rnum, cnum + 3, p)
+            s1.write(rnum, cnum + 4, a)
+            s1.write(rnum, cnum + 5, float(p)-float(a))
+            s1.write(rnum, cnum + 6, m)
+            rnum += 1
+    newXS.close()
+
+
+''' 
 def removeAll():
     for record in testTree.get_children():
         testTree.delete(record)
 '''
 
-# Buttons
+# Main Entry Buttons
 addButton = Button(tableFrame, text = "Add expense", command = openAddMenu, font = usernameFont, height = 4, width = 15)
 addButton.grid(row = 3, column = 0, pady = 20)
 addButton.config(bg = '#40c25c')
@@ -281,7 +309,8 @@ removeButton = Button(tableFrame, text = "Delete Entry", font = usernameFont, co
 removeButton.grid(row = 3, column = 4, pady = 20)
 removeButton.config(bg = '#d14232')
 
-
+convertButton = Button(budgetFrame, text = "Convert", command = export, font = usernameFont, height = 3, width = 15, bg = accentColor)
+convertButton.grid(row = 0, column = 0, pady = 0)
 # Formatting (font changes)
 style = ttk.Style()
 style.configure("Treeview.Heading", font=(None, 12))
