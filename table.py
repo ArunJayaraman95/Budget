@@ -22,7 +22,7 @@ def showFrame(frame):
 
 # Creating window
 root=Tk()
-root.state("zoomed")  #Makes it fullscreen automatically
+root.state("zoomed")  #Fullscreen
 sx = root.winfo_screenwidth() 
 sy = root.winfo_screenheight()
 
@@ -59,33 +59,34 @@ viewFrame.config(highlightbackground='black', highlightthickness=0)
 # Scrollbar and table setup
 tableScroll = ttk.Scrollbar(viewFrame, orient = 'vertical')
 tableScroll.pack(side = RIGHT, fill = Y)
-testTree = ttk.Treeview(viewFrame, yscrollcommand= tableScroll.set)
-tableScroll.config(command = testTree.yview)
+budgetTree = ttk.Treeview(viewFrame, yscrollcommand= tableScroll.set)
+tableScroll.config(command = budgetTree.yview)
 
 # Define columns
-testTree['columns'] = ("Date", "Name", "Planned", "Actual", "Difference", "Notes")
+budgetTree['columns'] = ("Date", "Name", "Planned", "Actual", "Difference", "Notes")
 
 # Format columns
-testTree.column("#0", width = 0, stretch = NO)
-testTree.column("Date", width = 140, anchor = W)
-testTree.column("Name", width = 120, anchor = W)
-testTree.column("Planned", width = 150, anchor = E)
-testTree.column("Actual", width = 150, anchor = E)
-testTree.column("Difference", width = 150, anchor = E)
-testTree.column("Notes", width = 270, anchor = E)
+budgetTree.column("#0", width = 0, stretch = NO)
+budgetTree.column("Date", width = 140, anchor = W)
+budgetTree.column("Name", width = 120, anchor = W)
+budgetTree.column("Planned", width = 150, anchor = E)
+budgetTree.column("Actual", width = 150, anchor = E)
+budgetTree.column("Difference", width = 150, anchor = E)
+budgetTree.column("Notes", width = 270, anchor = E)
 
 #testTree.heading("#0", text = "Label", anchor = W)
-testTree.heading("Date", text = "Date", anchor = CENTER)
-testTree.heading("Name", text = "Name", anchor = CENTER)
-testTree.heading("Planned", text = "Planned", anchor = CENTER)
-testTree.heading("Actual", text = "Actual", anchor = CENTER)
-testTree.heading("Difference", text = "Difference", anchor = CENTER)
-testTree.heading("Notes", text = "Notes", anchor = CENTER)
+budgetTree.heading("Date", text = "Date", anchor = CENTER)
+budgetTree.heading("Name", text = "Name", anchor = CENTER)
+budgetTree.heading("Planned", text = "Planned", anchor = CENTER)
+budgetTree.heading("Actual", text = "Actual", anchor = CENTER)
+budgetTree.heading("Difference", text = "Difference", anchor = CENTER)
+budgetTree.heading("Notes", text = "Notes", anchor = CENTER)
 
-testTree.tag_configure('oddrow', background = "white")
-testTree.tag_configure('evenrow', background = "blue")
+budgetTree.tag_configure('oddrow', background = "white")
+budgetTree.tag_configure('evenrow', background = "blue")
 
 
+# Generate tuple from data
 def ext(date, name, planned, actual, notes = ""):
     a = date
     b = name
@@ -100,7 +101,6 @@ def ext(date, name, planned, actual, notes = ""):
     return (a, b, c, d, e, f)
 
 
-
 #Read in csv data
 expenseCount = 0
 with open('UserData/'+activeUser+'.csv', 'r') as file:
@@ -109,9 +109,9 @@ with open('UserData/'+activeUser+'.csv', 'r') as file:
             print(line)
             tempTuple = ext(line[0], line[1], line[2], line[3], line[4])
             if expenseCount % 2 == 0:
-                testTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('evenrow',))
+                budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('evenrow',))
             else:
-                testTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('oddrow',))
+                budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('oddrow',))
             expenseCount += 1
 
 # JUNK DATA
@@ -126,14 +126,14 @@ for i in range(40):
 
 
 # Pack table
-testTree.pack()
+budgetTree.pack()
 
 
 # Button functions
 def addExpense():
     global expenseCount
     date = monthEntry + "/" + dayEntry + "/" + yearEntry
-    testTree.insert(parent = '', index = 'end', iid = expenseCount, values = ext(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
+    budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = ext(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
     expenseCount += 1
     with open('UserData/' + activeUser + '.csv', 'a', newline = '') as cFile:
         cWriter = csv.writer(cFile, delimiter=',')
@@ -200,11 +200,11 @@ def openAddMenu():
 
 
 def updateExpense():
-    selected = testTree.focus()
+    selected = budgetTree.focus()
     date = umonthEntry + "/" + udayEntry + "/" + uyearEntry
     print(selected)
     # Save new info
-    testTree.item(selected, text = "", values = ext(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get()))
+    budgetTree.item(selected, text = "", values = ext(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get()))
     updateData()
 
 
@@ -212,12 +212,10 @@ def openUpdateMenu():
     utop = Toplevel()
     utop.geometry("%dx%d" % (sx*.25, sy*0.6))
     utop.config(background = accentColor)
-    updCal = Calendar(utop, selectmode = 'day', year = 2021, month = 6, day = 22, date_pattern = 'mm/dd/yyyy')
-    updCal.grid(row = 0, column = 0, pady = 20, padx = 20, columnspan = 2, rowspan = 3)
 
     global umonthEntry, udayEntry, uyearEntry
     global unameEntry, uplannedEntry, uactualEntry, unotesEntry
-
+    
     selDateLabel = Label(utop, text = "Selected Date: __/__/__", bg = accentColor)
     selDateLabel.grid(row = 1, column = 2, columnspan = 2, pady = 10, sticky = E)
 
@@ -255,6 +253,23 @@ def openUpdateMenu():
     uactualEntry.grid(row = 5, column = 1, pady = 10)
     unotesEntry.grid(row = 6, column = 1, pady = 10)
 
+    selected = budgetTree.focus()
+    tempValues = budgetTree.item(selected, 'values')
+
+    unameEntry.insert(0, tempValues[1])
+    uplannedEntry.insert(0, tempValues[2].replace('$',''))
+    uactualEntry.insert(0, tempValues[3].replace('$',''))
+    unotesEntry.insert(0, tempValues[5])
+
+    tm = tempValues[0][:2]
+    td = tempValues[0][3:5]
+    ty = tempValues[0][-4:]
+    print(td, tm, ty)
+    updCal = Calendar(utop, selectmode = 'day', year = int(ty), month = int(tm), day = int(td), date_pattern = 'mm/dd/yyyy')
+    updCal.grid(row = 0, column = 0, pady = 20, padx = 20, columnspan = 2, rowspan = 3)
+    grabDate()
+
+
     updateButton = Button(utop, text = "Update Entry", command = updateExpense)
     updateButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = W)
 
@@ -266,10 +281,11 @@ def deleteExpense():
     global expenseCount
     c = messagebox.askokcancel("Warning", "Are you sure you want to delete selected item(s)? (This cannot be undone)")
     if c:
-        for record in testTree.selection():
-            testTree.delete(record)
+        for record in budgetTree.selection():
+            budgetTree.delete(record)
             expenseCount -= 1
     updateData()
+
 
 def export():
     newXS = xw.Workbook('HELLO THERE.xlsx')
@@ -303,8 +319,8 @@ def export():
 def updateData():
     with open('UserData/' + activeUser + '.csv', 'w', newline = '') as uFile:
         cWriter = csv.writer(uFile, delimiter = ',')
-        for record in testTree.get_children():
-            t = testTree.item(record)['values']
+        for record in budgetTree.get_children():
+            t = budgetTree.item(record)['values']
             temp = [t[0], t[1], str(t[2]).replace('$', '').replace(',',''), str(t[3]).replace('$','').replace(',',''), t[5]]
             
             cWriter.writerow(temp)
