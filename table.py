@@ -1,13 +1,12 @@
 # Imports
 from tkinter import *
 from tkinter import messagebox
-import tkinter.font as font
 from tkinter import ttk
 import csv
 from tkcalendar import *
-from random import randint
 import xlsxwriter as xw
 
+#region Window Config
 # Define colors
 mainColor = "#70A0A2"
 accentColor = "#57729E"
@@ -17,6 +16,8 @@ buttonFont = ("Helvetica", 24)
 inputFont = ("Verdana", 20)
 usernameFont = ("Verdana", 16)
 aFont = ("Times New Roman", 20)
+
+
 def showFrame(frame):
     frame.tkraise()
 
@@ -39,11 +40,12 @@ budgetFrame = Frame(root, background = mainColor)
 budgetFrame.grid(row = 0, column = 0, sticky = "nsew")
 
 showFrame(budgetFrame)
-
+#endregion Window config
 
 #region Frame1
 #============Frame 1 ==============# 
 
+#region Frame configuration
 # Variables
 activeUser = "test"
 entries = []
@@ -85,9 +87,10 @@ budgetTree.heading("Notes", text = "Notes", anchor = CENTER)
 budgetTree.tag_configure('oddrow', background = "white")
 budgetTree.tag_configure('evenrow', background = "blue")
 
+#endregion Frame Configuration
 
-# Generate tuple from data
-def ext(date, name, planned, actual, notes = ""):
+# Generate tuple from data for updates/insertions
+def toTuple(date, name, planned, actual, notes = ""):
     a = date
     b = name
     c = '${:,.2f}'.format(float(planned)) 
@@ -103,11 +106,10 @@ def ext(date, name, planned, actual, notes = ""):
 
 #Read in csv data
 expenseCount = 0
-with open('UserData/'+activeUser+'.csv', 'r') as file:
+with open('UserData/'+ activeUser + '.csv', 'r') as file:
         reader = csv.reader(file)
         for line in reader:
-            print(line)
-            tempTuple = ext(line[0], line[1], line[2], line[3], line[4])
+            tempTuple = toTuple(line[0], line[1], line[2], line[3], line[4])
             if expenseCount % 2 == 0:
                 budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('evenrow',))
             else:
@@ -128,16 +130,17 @@ for i in range(40):
 # Pack table
 budgetTree.pack()
 
+#region Button Functions
+# ========= Button functions =========== #
 
-# Button functions
+# Add expense to table
 def addExpense():
     global expenseCount
     date = monthEntry + "/" + dayEntry + "/" + yearEntry
-    budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = ext(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
+    budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
     expenseCount += 1
     with open('UserData/' + activeUser + '.csv', 'a', newline = '') as cFile:
         cWriter = csv.writer(cFile, delimiter=',')
-        print(date)
         cWriter.writerow([date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()])
     updateData()
     # Delete entries
@@ -199,12 +202,13 @@ def openAddMenu():
     cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
 
 
+# Update entry in table
 def updateExpense():
     selected = budgetTree.focus()
     date = umonthEntry + "/" + udayEntry + "/" + uyearEntry
-    print(selected)
+
     # Save new info
-    budgetTree.item(selected, text = "", values = ext(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get()))
+    budgetTree.item(selected, text = "", values = toTuple(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get()))
     updateData()
 
 
@@ -219,7 +223,7 @@ def openUpdateMenu():
     selDateLabel = Label(utop, text = "Selected Date: __/__/__", bg = accentColor)
     selDateLabel.grid(row = 1, column = 2, columnspan = 2, pady = 10, sticky = E)
 
-
+    # Get date from calendar
     def grabDate():
         global umonthEntry, udayEntry, uyearEntry
         selectedDate = updCal.get_date()
@@ -264,7 +268,6 @@ def openUpdateMenu():
     tm = tempValues[0][:2]
     td = tempValues[0][3:5]
     ty = tempValues[0][-4:]
-    print(td, tm, ty)
     updCal = Calendar(utop, selectmode = 'day', year = int(ty), month = int(tm), day = int(td), date_pattern = 'mm/dd/yyyy')
     updCal.grid(row = 0, column = 0, pady = 20, padx = 20, columnspan = 2, rowspan = 3)
     grabDate()
@@ -277,6 +280,7 @@ def openUpdateMenu():
     cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 45, ipady = 20, pady = 10, sticky = W)
 
 
+# Remove expense from table
 def deleteExpense():
     global expenseCount
     c = messagebox.askokcancel("Warning", "Are you sure you want to delete selected item(s)? (This cannot be undone)")
@@ -287,6 +291,7 @@ def deleteExpense():
     updateData()
 
 
+# Export file as xlsx
 def export():
     newXS = xw.Workbook('HELLO THERE.xlsx')
     s1 = newXS.add_worksheet('Current Month')
@@ -313,19 +318,20 @@ def export():
             s1.write(rnum, cnum + 6, m)
             rnum += 1
     newXS.close()
-    print(entries)
 
 
+# Update CSV with current table data
 def updateData():
     with open('UserData/' + activeUser + '.csv', 'w', newline = '') as uFile:
         cWriter = csv.writer(uFile, delimiter = ',')
         for record in budgetTree.get_children():
             t = budgetTree.item(record)['values']
             temp = [t[0], t[1], str(t[2]).replace('$', '').replace(',',''), str(t[3]).replace('$','').replace(',',''), t[5]]
-            
             cWriter.writerow(temp)
-            #cWriter.writerow(testTree.item(record)['values'].replace('$', ''))
     uFile.close()
+
+#endregion ButtonFunctions
+
 
 # Main Entry Buttons
 addButton = Button(tableFrame, text = "Add expense", command = openAddMenu, font = usernameFont, height = 4, width = 15)
@@ -342,6 +348,7 @@ removeButton.config(bg = '#d14232')
 
 convertButton = Button(budgetFrame, text = "Convert", command = export, font = usernameFont, height = 3, width = 15, bg = accentColor)
 convertButton.grid(row = 0, column = 0, pady = 0)
+
 # Formatting (font changes)
 style = ttk.Style()
 style.configure("Treeview.Heading", font=(None, 12))
