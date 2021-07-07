@@ -1,4 +1,5 @@
 import pyrebase
+import urllib
 
 firebaseConfig = {
     "apiKey": "AIzaSyB07JiaeBfXONn4Sz4TvdJ4xWQqE3X21D8",
@@ -42,6 +43,13 @@ storage = firebase.storage()
 # cloudFileName = input("Enter cloud file name: ")
 # storage.child(cloudFileName).put(fileName)
 
-cloudFileName = input("Enter file to download: ")
-storage.child(cloudFileName).download("", "dCars.txt")
-print("Success")
+# Downloading file
+# cloudFileName = input("Enter file to download: ")
+# storage.child(cloudFileName).download("", "dCars.txt")
+# print("Success")
+
+# Reading file
+cloudFileName = input("File to download")
+url = storage.child(cloudFileName).get_url(None)
+f = urllib.request.urlopen(url).read()
+print(f)
