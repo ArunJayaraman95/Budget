@@ -58,6 +58,17 @@ viewFrame = Frame(tableFrame, bg = accentColor)
 viewFrame.grid(row = 0, column = 0, columnspan = 5)
 viewFrame.config(highlightbackground='black', highlightthickness=0)
 
+# Label to Display Month:
+budget_date_label = Label(budgetFrame, text = "Viewing budget for 06/2021", bg = 'red')
+budget_date_label.grid(row = 1, column = 0, pady = 10, padx = 10)
+
+inputViewMonth = Entry(budgetFrame)
+inputViewMonth.grid(row = 2, column = 0, pady = 10, padx = 10)
+
+confirmViewMonth = Button(budgetFrame, text = "View")
+confirmViewMonth.grid(row = 3, column = 0, pady = 10, padx = 10)
+
+
 # Scrollbar and table setup
 tableScroll = ttk.Scrollbar(viewFrame, orient = 'vertical')
 tableScroll.pack(side = RIGHT, fill = Y)
