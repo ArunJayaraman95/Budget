@@ -11,9 +11,9 @@ mainColor = "#56C3A2"
 accentColor = "#57729E"
 
 # Define fonts
-buttonFont = ("Helvetica", 24)
-inputFont = ("Verdana", 20)
-usernameFont = ("Verdana", 16)
+buttonFont = ("Helvetica", 20)
+inputFont = ("Verdana", 16)
+usernameFont = ("Verdana", 12)
 
 def showFrame(frame):
     frame.tkraise()
@@ -33,8 +33,7 @@ registerFrame = Frame(root, background = mainColor)
 for frame in (loginFrame, registerFrame):
     frame.grid(row = 0, column = 0, sticky = "nsew")
 
-# Starting frame
-showFrame(loginFrame)
+showFrame(registerFrame)
 
 sx = root.winfo_screenwidth() 
 sy = root.winfo_screenheight()
@@ -107,14 +106,14 @@ pInput.grid(row = 4, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = '
 submitButton = Button(loginMenu, text = "Submit", bg = "#A9e451", padx = 10, pady = 0, font = ("Verdana", 15), command = submitLogin)
 submitButton.grid(row = 5, column = 1, padx = 20, pady = 10, sticky = 'ew')
 registerButton = Button(loginMenu, text = "Make new account", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(registerFrame))
-registerButton.grid(row = 5, column = 0, padx = 20, pady = 10, sticky = 'ew')
+registerButton.grid(row = 6, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
 #endregion
 
-# Strong Password Check Function
+
 #####################################################################################################
 
-
+import re
 def uppercase_check(passEntry):
     if re.search('[A-Z]', passEntry): #atleast one uppercase character
         return True
@@ -129,12 +128,6 @@ def digit_check(passEntry):
     if re.search('[0-9]', passEntry): #atleast one digit
         return True
     return False
-
-def spCr_check(passEntry):
-    if re.search('[_@$!#%&?/\-]', passEntry): #atleast one digit
-        return True
-    return False
-
 
 
 #####################################################################################################
@@ -158,24 +151,24 @@ def registerAccount():
             print(line)
             if line[0].lower().strip() == userEntry.lower():
                 print("User already exists")
-                messagebox.showwarning("Error", "User already exists")
                 foundFlag = True
                 
 
         if not foundFlag:
-                #messagebox.showwarning("Password", "Must be in \n 1) Minimum 8 characters.\n 2) The alphabets must be between [a-z].\n 3) At least one alphabet should be of Upper Case [A-Z].\n 4) At least 1 number or digit between [0-9].")
+            #messagebox.showwarning("Password", "Must be in \n 1) Minimum 8 characters.\n 2) The alphabets must be between [a-z].\n 3) At least one alphabet should be of Upper Case [A-Z].\n 4) At least 1 number or digit between [0-9].")
             if passEntry != confEntry:
-                messagebox.showerror("Error", "Passwords don't match")
+                messagebox.showwarning("Error", "Passwords don't match")
 
-            elif len(passEntry) >= 8 and uppercase_check(passEntry) and lowercase_check(passEntry) and digit_check(passEntry) and spCr_check(passEntry) :
-                messagebox.showinfo("Excelent", "Your password is strong")
+            elif len(passEntry) >= 8 and uppercase_check(passEntry) and lowercase_check(passEntry) and digit_check(passEntry):
+                messagebox.showwarning("Alarm", "Password is strong")
                 with open ('UserData/userList.csv', 'a') as file:
                     writer = csv.writer(file, lineterminator="\n")
                     writer.writerow([userEntry, passEntry])
                 print("User ", userEntry, "added!")
-                messagebox.showinfo("Success!", "User is added successfully!")  
+                messagebox.showinfo("Success!", "User added!")
+            
             else:
-                messagebox.showwarning("Warning!", "Password is weak \n Password Must be in \n 1). Minimum 8 characters.\n 2). The alphabets must be between [a-z].\n 3). At least one alphabet should be of Upper Case [A-Z].\n 4). At least 1 number or digit between [0-9].\n 5). At least 1 special character ")
+                messagebox.showwarning("Alarm", "Password is weak \n Password Must be in \n 1) Minimum 8 characters.\n 2) The alphabets must be between [a-z].\n 3) At least one alphabet should be of Upper Case [A-Z].\n 4) At least 1 number or digit between [0-9].")
                 
     
     urInput.delete(0, END)
@@ -188,7 +181,7 @@ widthAdjuster2 = 0.37
 heightAdjuster2 = 0.2
 registerMenu = Frame(registerFrame, bg = accentColor)
 #registerMenu.grid(row = 0, column = 0, padx = sx * widthAdjuster2, pady = sy * heightAdjuster2, ipadx = 0, ipady = 0)
-registerMenu.place(height = 500, width = 460, anchor = CENTER, rely = 0.5, relx = 0.5)
+registerMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
 
 
 # Create labels for login and place them
@@ -198,11 +191,14 @@ registerTitle.grid(row = 0, column = 0, padx = 10, pady = 10, columnspan = 2, st
 usernameLabel = Label(registerMenu, text = "Username: ", font = usernameFont, bg = accentColor)
 usernameLabel.grid(row = 1, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = "w")
 
+emailLabel = Label(registerMenu, text = "Email: ", font = usernameFont, bg = accentColor)
+emailLabel.grid(row = 3, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'w')
+
 passwordLabel = Label(registerMenu, text = "Password: ", font = usernameFont, bg = accentColor)
-passwordLabel.grid(row = 3, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'w')
+passwordLabel.grid(row = 5, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'w')
 
 passwordConLabel = Label(registerMenu, text = "Confirm Password: ", font = usernameFont, bg = accentColor)
-passwordConLabel.grid(row = 5, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'w')
+passwordConLabel.grid(row = 7, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'w')
 
 
 # Create input box for username and password
@@ -212,15 +208,18 @@ urInput.grid(row = 2, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 
 prInput = Entry(registerMenu, width = 20, font = inputFont, show = '*')
 prInput.grid(row = 4, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
 
+prInput = Entry(registerMenu, width = 20, font = inputFont, show = '*')
+prInput.grid(row = 6, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
+
 pcInput = Entry(registerMenu, width = 20, font = inputFont, show = '*')
-pcInput.grid(row = 6, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
+pcInput.grid(row = 8, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
 
 #Create buttons
 confirmButton = Button(registerMenu, text = "Register", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = registerAccount)
-confirmButton.grid(row = 7, column = 1, padx = 20, pady = 10, sticky = 'ew')
+confirmButton.grid(row = 10, column = 1, padx = 20, pady = 10, sticky = 'ew')
 
 returnButton = Button(registerMenu, text = "Return to login", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(loginFrame))
-returnButton.grid(row = 7, column = 0, padx = 20, pady = 10, sticky = 'ew')
+returnButton.grid(row = 10, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
 
 root.mainloop()
