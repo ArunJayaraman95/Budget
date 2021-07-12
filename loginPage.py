@@ -5,6 +5,8 @@ import tkinter.font as font
 import re
 #from PIL import ImageTk, Image
 import csv
+import smtplib, ssl
+import random, string
 
 # Define colors
 mainColor = "#56C3A2"
@@ -29,8 +31,9 @@ root.columnconfigure(0, weight = 1)
 
 loginFrame = Frame(root, background = mainColor)
 registerFrame = Frame(root, background = mainColor)
+twoFactorFrame = Frame(root, background = mainColor)
 
-for frame in (loginFrame, registerFrame):
+for frame in (loginFrame, registerFrame, twoFactorFrame):
     frame.grid(row = 0, column = 0, sticky = "nsew")
 
 showFrame(registerFrame)
@@ -44,7 +47,7 @@ root.title("Budget Boi")
 root.iconbitmap("img/WayneStateLogo.ico")
 
 #region Frame1
-#============Frame 1 ==============# 
+#============Login Frame 1 ==============# 
 # Variables
 activeUser = ""
 
@@ -66,13 +69,14 @@ def submitLogin():
                 foundFlag = True
                 activeUser = userEntry
                 messagebox.showinfo("Success!", "Welcome " + activeUser + "!")
+
+                
+                
                 break
         if not foundFlag:
             print("Username (" + userEntry + ") not found")
             messagebox.showwarning("User not found")
-            #warningLabel = Label(loginMenu, text = "Incorrect credentials", fg = "#FF890A", bg = accentColor)
-            #warningLabel.config(font = ("Verdana", 12))
-            #warningLabel.grid(row = 6, column = 1)
+       
     uInput.delete(0, END)
     pInput.delete(0, END)
     print("Active user:", activeUser)
@@ -81,8 +85,6 @@ def submitLogin():
 widthAdjuster = 0.4
 heightAdjuster = 0.2
 loginMenu = Frame(loginFrame, bg = accentColor)
-#loginMenu.grid(row = 0, column = 0, padx = sx * widthAdjuster, pady = sy * heightAdjuster, ipadx = 0, ipady = 0)
-#loginMenu.place(height = 500, width = 400, anchor = CENTER, rely = 0.5, relx = 0.5)
 loginMenu.pack()
 loginMenu.config()
 # Labels
@@ -110,10 +112,10 @@ registerButton.grid(row = 6, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
 #endregion
 
-
+# ===============RegisterAccount Frame 2=====================#
 #####################################################################################################
 
-import re
+
 def uppercase_check(passEntry):
     if re.search('[A-Z]', passEntry): #atleast one uppercase character
         return True
@@ -129,10 +131,15 @@ def digit_check(passEntry):
         return True
     return False
 
-
+def check(email):   
+    regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'  
+    if(re.search(regex,email)):
+        return True
+    else:
+        return False 
 #####################################################################################################
 
-# ===============Frame 2=====================#
+
 
 # Functions
 def registerAccount():
@@ -140,6 +147,7 @@ def registerAccount():
 
     # Store entries
     userEntry = urInput.get()
+    emailEntry = emInput.get()
     passEntry = prInput.get()
     confEntry = pcInput.get()
     foundFlag = False
@@ -155,8 +163,11 @@ def registerAccount():
                 
 
         if not foundFlag:
-            #messagebox.showwarning("Password", "Must be in \n 1) Minimum 8 characters.\n 2) The alphabets must be between [a-z].\n 3) At least one alphabet should be of Upper Case [A-Z].\n 4) At least 1 number or digit between [0-9].")
-            if passEntry != confEntry:
+            
+            if not  check(emailEntry):
+                    messagebox.showwarning("Alarm", "Invalid Email")
+               
+            elif passEntry != confEntry:
                 messagebox.showwarning("Error", "Passwords don't match")
 
             elif len(passEntry) >= 8 and uppercase_check(passEntry) and lowercase_check(passEntry) and digit_check(passEntry):
@@ -166,12 +177,27 @@ def registerAccount():
                     writer.writerow([userEntry, passEntry])
                 print("User ", userEntry, "added!")
                 messagebox.showinfo("Success!", "User added!")
+
+                #to do move into success section
+                code = SendTwoFactorCode(emailEntry)
+                
+
+
+
+        
+
+
+
+
             
             else:
                 messagebox.showwarning("Alarm", "Password is weak \n Password Must be in \n 1) Minimum 8 characters.\n 2) The alphabets must be between [a-z].\n 3) At least one alphabet should be of Upper Case [A-Z].\n 4) At least 1 number or digit between [0-9].")
-                
-    
+
+  
+
+   
     urInput.delete(0, END)
+    emInput.delete(0,END)
     prInput.delete(0, END)
     pcInput.delete(0, END)
 
@@ -205,14 +231,15 @@ passwordConLabel.grid(row = 7, column = 0, padx = 10, pady = 10, columnspan = 2,
 urInput = Entry(registerMenu, width = 20, font = inputFont)
 urInput.grid(row = 2, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
 
-prInput = Entry(registerMenu, width = 20, font = inputFont, show = '*')
-prInput.grid(row = 4, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
+emInput = Entry(registerMenu, width = 20, font = inputFont)
+emInput.grid(row = 4, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
 
 prInput = Entry(registerMenu, width = 20, font = inputFont, show = '*')
 prInput.grid(row = 6, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
 
 pcInput = Entry(registerMenu, width = 20, font = inputFont, show = '*')
 pcInput.grid(row = 8, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
+
 
 #Create buttons
 confirmButton = Button(registerMenu, text = "Register", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = registerAccount)
@@ -221,5 +248,43 @@ confirmButton.grid(row = 10, column = 1, padx = 20, pady = 10, sticky = 'ew')
 returnButton = Button(registerMenu, text = "Return to login", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(loginFrame))
 returnButton.grid(row = 10, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
+# ===============TwoFactorCode Frame 3=====================#
+
+def randomword(length):
+   letters = "1234567890abcdefghijklmnopqrstuvwxyz"
+   return ''.join(random.choice(letters) for i in range(length))
+
+port = 465  # For SSL
+#password = input("Type your password and press enter: ")
+
+# Create a secure SSL context
+context = ssl.create_default_context()
+
+def SendTwoFactorCode(email_recipent):
+    code = randomword(10)
+    #do to make code random
+
+
+    port = 465  # For SSL
+    smtp_server = "smtp.gmail.com"
+    sender_email = "robiakther007@gmail.com"  # Enter your address
+    receiver_email = email_recipent # Enter receiver address
+    password = "ra101112"
+    message = """\
+    Subject: Hi there
+
+    Your two factor authentication code is """+ code + "."
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message)
+    return code
+
+widthAdjuster2 = 0.37
+heightAdjuster2 = 0.2
+factorMenu = Frame(twoFactorFrame, bg = accentColor)
+#registerMenu.grid(row = 0, column = 0, padx = sx * widthAdjuster2, pady = sy * heightAdjuster2, ipadx = 0, ipady = 0)
+factorMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
 
 root.mainloop()
