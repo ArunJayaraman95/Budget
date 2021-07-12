@@ -169,21 +169,6 @@ budgetTree.pack()
 #region Button Functions
 # ========= Button functions =========== #
 
-# Add expense to table
-def addExpense():
-    global expenseCount
-    date = monthEntry + "/" + dayEntry + "/" + yearEntry
-    budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
-    entries.append(toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
-    expenseCount += 1
-    with open('UserData/' + activeUser + '.csv', 'a', newline = '') as cFile:
-        cWriter = csv.writer(cFile, delimiter=',')
-        cWriter.writerow([date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()])
-    updateCSV()
-    displayCurrentMonth()
-    # Delete entries
-    #for col in entryEditList:
-    #    col.delete(0, END)
 
 
 def openAddMenu():
@@ -232,8 +217,24 @@ def openAddMenu():
     plannedEntry.grid(row = 4, column = 1, pady = 10)
     actualEntry.grid(row = 5, column = 1, pady = 10)
     notesEntry.grid(row = 6, column = 1, pady = 10)
+    # Add expense to table
+    def addExpense():
+        global expenseCount
+        date = monthEntry + "/" + dayEntry + "/" + yearEntry
+        budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
+        entries.append(toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
+        expenseCount += 1
+        with open('UserData/' + activeUser + '.csv', 'a', newline = '') as cFile:
+            cWriter = csv.writer(cFile, delimiter=',')
+            cWriter.writerow([date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()])
+        updateCSV()
+        displayCurrentMonth()
+        top.destroy()
+        # Delete entries
+        #for col in entryEditList:
+        #    col.delete(0, END)
 
-    addEntryButton = Button(top, text = "Add Entry", command = [addExpense, top.destroy])
+    addEntryButton = Button(top, text = "Add Entry", command = addExpense)
     addEntryButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
 
     cancelAddButton = Button(top, text = "Cancel", command = lambda: top.destroy())
