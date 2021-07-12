@@ -70,13 +70,24 @@ def submitLogin():
                 activeUser = userEntry
                 messagebox.showinfo("Success!", "Welcome " + activeUser + "!")
 
-                
+                #here
+                #code = SendTwoFactorCode("ffddfdf@dfdsf.com")
+                #steps
+                #build frame with input box and button
+                #show two factor authentication input box in frame
+                #add event trigger to button that when pressed chechs user input == code
+                #if UserAuthCode == code:
+                    #Leave
+                #else:
+                    #show error
                 
                 break
         if not foundFlag:
             print("Username (" + userEntry + ") not found")
             messagebox.showwarning("User not found")
-       
+            #warningLabel = Label(loginMenu, text = "Incorrect credentials", fg = "#FF890A", bg = accentColor)
+            #warningLabel.config(font = ("Verdana", 12))
+            #warningLabel.grid(row = 6, column = 1)
     uInput.delete(0, END)
     pInput.delete(0, END)
     print("Active user:", activeUser)
@@ -180,7 +191,14 @@ def registerAccount():
 
                 #to do move into success section
                 code = SendTwoFactorCode(emailEntry)
-                
+                #steps
+                #build frame with input box and button
+                #show two factor authentication input box in frame
+                #add event trigger to button that when pressed chechs user input == code
+                #if UserAuthCode == code:
+                    #Leave
+                #else:
+                    #show error
 
 
 
@@ -283,8 +301,21 @@ def SendTwoFactorCode(email_recipent):
 
 widthAdjuster2 = 0.37
 heightAdjuster2 = 0.2
-factorMenu = Frame(twoFactorFrame, bg = accentColor)
-#registerMenu.grid(row = 0, column = 0, padx = sx * widthAdjuster2, pady = sy * heightAdjuster2, ipadx = 0, ipady = 0)
-factorMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
 
+factorMenu = Frame(twoFactorFrame, bg = accentColor)
+factorMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
+# Create labels for Two-Factor Authentication
+twoFactorTitle = Label(factorMenu, text = "Two-Factor Authentication", font = ("Courier", 60), bg = accentColor)
+twoFactorTitle.grid(row = 0, column = 0, padx = 10, pady = 10, columnspan = 2, sticky = "ew")
+
+entercodeLabel = Label(factorMenu, text = "Enter code: ", font = usernameFont, bg = accentColor)
+entercodeLabel.grid(row = 1, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = "w")
+
+# Create input box for Enter code
+ecInput = Entry(factorMenu, width = 20, font = inputFont)
+ecInput.grid(row = 2, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
+
+#Create buttons
+doneButton = Button(factorMenu, text = "Done", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = registerAccount)
+doneButton.grid(row = 3, column = 1, padx = 20, pady = 10, sticky = 'ew')
 root.mainloop()
