@@ -62,10 +62,23 @@ viewFrame.config(highlightbackground='black', highlightthickness=0)
 budget_date_label = Label(budgetFrame, text = "Viewing budget for 06/2021", bg = 'red')
 budget_date_label.grid(row = 1, column = 0, pady = 10, padx = 10)
 
-inputViewMonth = Entry(budgetFrame)
-inputViewMonth.grid(row = 2, column = 0, pady = 10, padx = 10)
+viewMonthEntry = Entry(budgetFrame)
+viewMonthEntry.grid(row = 2, column = 0, pady = 10, padx = 10)
 
-confirmViewMonth = Button(budgetFrame, text = "View")
+
+viewMonth = "07"
+def updateTable():
+    global viewMonth
+    vm = viewMonthEntry.get()
+    if int(vm) >= 1 and int(vm) <= 12:
+        if len(vm) == 1:
+            vm = '0' + vm
+        viewMonth = vm
+        displayCurrentMonth()
+    else:
+        messagebox.showwarning("Invalid Input!", "Month must be an integer from 1 to 12")
+
+confirmViewMonth = Button(budgetFrame, text = "View", command = updateTable)
 confirmViewMonth.grid(row = 3, column = 0, pady = 10, padx = 10)
 
 
@@ -115,16 +128,30 @@ def toTuple(date, name, planned, actual, notes = ""):
     return (a, b, c, d, e, f)
 
 
-#Read in csv data
+#Read in csv data to entries
 expenseCount = 0
-with open('UserData/'+ activeUser + '.csv', 'r') as file:
-        reader = csv.reader(file)
-        for line in reader:
-            tempTuple = toTuple(line[0], line[1], line[2], line[3], line[4])
-            entries.append([line[0], line[1], line[2], line[3], line[4]])
-            budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple)
+def readCSVtoTable():
+    with open('UserData/'+ activeUser + '.csv', 'r') as file:
+            reader = csv.reader(file)
+            for line in reader:
+                tempTuple = toTuple(line[0], line[1], line[2], line[3], line[4])
+                entries.append(tempTuple)
+
+
+def displayCurrentMonth():
+    global expenseCount
+    expenseCount = 0
+    print(entries)
+    for record in budgetTree.get_children():
+            budgetTree.delete(record)
+            expenseCount -= 1
+    for entry in entries:
+        if str(entry[0][:2]) == viewMonth:
+            budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = entry)
             expenseCount += 1
 
+readCSVtoTable()    
+displayCurrentMonth()
 # JUNK DATA
 '''
 for i in range(40):
@@ -147,11 +174,14 @@ def addExpense():
     global expenseCount
     date = monthEntry + "/" + dayEntry + "/" + yearEntry
     budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
+    entries.append(toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
     expenseCount += 1
     with open('UserData/' + activeUser + '.csv', 'a', newline = '') as cFile:
         cWriter = csv.writer(cFile, delimiter=',')
         cWriter.writerow([date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()])
-    updateData()
+    
+    updateCSV()
+    displayCurrentMonth()
     # Delete entries
     #for col in entryEditList:
     #    col.delete(0, END)
@@ -218,7 +248,7 @@ def updateExpense():
 
     # Save new info
     budgetTree.item(selected, text = "", values = toTuple(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get()))
-    updateData()
+    updateCSV()
 
 
 def openUpdateMenu():
@@ -297,7 +327,7 @@ def deleteExpense():
         for record in budgetTree.selection():
             budgetTree.delete(record)
             expenseCount -= 1
-    updateData()
+    updateCSV()
 
 
 # Export file as xlsx
@@ -330,7 +360,7 @@ def export():
 
 
 # Update CSV with current table data
-def updateData():
+def updateCSV():
     with open('UserData/' + activeUser + '.csv', 'w', newline = '') as uFile:
         cWriter = csv.writer(uFile, delimiter = ',')
         for record in budgetTree.get_children():
