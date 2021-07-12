@@ -179,7 +179,6 @@ def addExpense():
     with open('UserData/' + activeUser + '.csv', 'a', newline = '') as cFile:
         cWriter = csv.writer(cFile, delimiter=',')
         cWriter.writerow([date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()])
-    
     updateCSV()
     displayCurrentMonth()
     # Delete entries
@@ -234,7 +233,7 @@ def openAddMenu():
     actualEntry.grid(row = 5, column = 1, pady = 10)
     notesEntry.grid(row = 6, column = 1, pady = 10)
 
-    addEntryButton = Button(top, text = "Add Entry", command = addExpense)
+    addEntryButton = Button(top, text = "Add Entry", command = [addExpense, top.destroy])
     addEntryButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
 
     cancelAddButton = Button(top, text = "Cancel", command = lambda: top.destroy())
@@ -363,8 +362,7 @@ def export():
 def updateCSV():
     with open('UserData/' + activeUser + '.csv', 'w', newline = '') as uFile:
         cWriter = csv.writer(uFile, delimiter = ',')
-        for record in budgetTree.get_children():
-            t = budgetTree.item(record)['values']
+        for t in entries:
             temp = [t[0], t[1], str(t[2]).replace('$', '').replace(',',''), str(t[3]).replace('$','').replace(',',''), t[5]]
             cWriter.writerow(temp)
     uFile.close()
