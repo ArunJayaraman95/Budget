@@ -121,10 +121,8 @@ with open('UserData/'+ activeUser + '.csv', 'r') as file:
         reader = csv.reader(file)
         for line in reader:
             tempTuple = toTuple(line[0], line[1], line[2], line[3], line[4])
-            if expenseCount % 2 == 0:
-                budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('evenrow',))
-            else:
-                budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple, tags = ('oddrow',))
+            entries.append([line[0], line[1], line[2], line[3], line[4]])
+            budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple)
             expenseCount += 1
 
 # JUNK DATA
