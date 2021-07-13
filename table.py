@@ -133,7 +133,7 @@ def toTuple(date, name, planned, actual, notes = ""):
 expenseCount = 0
 def readCSVtoTable():
     global allEntries
-    allEntries = 0
+    allEntries = []
     with open('UserData/'+ activeUser + '.csv', 'r') as file:
             reader = csv.reader(file)
             for line in reader:
@@ -142,34 +142,34 @@ def readCSVtoTable():
 
 
 def displayCurrentMonth():
-    global expenseCount, currentEntries
+    global expenseCount, currentEntries, allEntries
     expenseCount = 0
-    currentEntries = []
+    print()
+    print("CURRENT", currentEntries)
+    print()
+    print("PREV ALL", allEntries)
+    allEntries = allEntries + currentEntries
+    print("COMBINED ALL", allEntries)
+    # Separate viewable entries by month
+    currentEntries = [x for x in allEntries if x[0][:2] == viewMonth]
+    allEntries = [x for x in allEntries if x[0][:2] != viewMonth]
+    print("ALL ENTRIES: ", allEntries)
+    print("Current entries!!! ==", currentEntries)
 
-    print(allEntries)
-
+    # Clear out table
     for record in budgetTree.get_children():
             budgetTree.delete(record)
             expenseCount -= 1
-    for entry in allEntries:
-        if str(entry[0][:2]) == viewMonth:
-            budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = entry)
-            expenseCount += 1
+
+    # For every entry in current entries add it to table
+    for entry in currentEntries:
+        budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = entry)
+        expenseCount += 1
 
 
 
 readCSVtoTable()    
 displayCurrentMonth()
-# JUNK DATA
-'''
-for i in range(40):
-    if expenseCount % 2 == 0:
-        testTree.insert(parent = '', index = 'end', iid = expenseCount,values = ext("jdate", "jname", randint(0, 100), 30.493), tags = ('evenrow'))
-    else:
-        testTree.insert(parent = '', index = 'end', iid = expenseCount, values = ext("jdate", "jname", randint(0, 200), randint(30, 240)), tags = ('oddrow',))
-    expenseCount += 1
-'''
-
 
 # Pack table
 budgetTree.pack()
@@ -228,28 +228,27 @@ def openAddMenu():
     # Add expense to table
     def addExpense():
         global expenseCount
+
         date = monthEntry + "/" + dayEntry + "/" + yearEntry
-        budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
-        allEntries.append(toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
+        tempTuple = toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get())
+
+        budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple)
+        currentEntries.append(tempTuple)
         expenseCount += 1
+
         with open('UserData/' + activeUser + '.csv', 'a', newline = '') as cFile:
             cWriter = csv.writer(cFile, delimiter=',')
             cWriter.writerow([date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()])
+
         updateCSV()
         displayCurrentMonth()
         top.destroy()
-        # Delete entries
-        #for col in entryEditList:
-        #    col.delete(0, END)
 
     addEntryButton = Button(top, text = "Add Entry", command = addExpense)
     addEntryButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
 
     cancelAddButton = Button(top, text = "Cancel", command = lambda: top.destroy())
     cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
-
-
-
 
 
 def openUpdateMenu():
@@ -314,12 +313,20 @@ def openUpdateMenu():
 
     # Update entry in table
     def updateExpense():
+        global currentEntries
         selected = budgetTree.focus()
         date = umonthEntry + "/" + udayEntry + "/" + uyearEntry
         tempTuple = toTuple(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get())
         # Save new info
         budgetTree.item(selected, text = "", values = tempTuple)
+        currentEntries = []
+        for t in budgetTree.get_children():
+            x = budgetTree.item(t, 'values')
+            print("Record:", x)
+            currentEntries.append(x)
 
+        # GOOD
+        print("\nNEW CURRENT: ", currentEntries)
         updateCSV()
         displayCurrentMonth()
         utop.destroy()
@@ -373,17 +380,24 @@ def export():
 
 # Update CSV with current table data
 def updateCSV():
+    global allEntries, currentEntries
+    allEntries = allEntries + currentEntries
+    currentEntries = []
+    print()
+    print(allEntries)
     with open('UserData/' + activeUser + '.csv', 'w', newline = '') as uFile:
         cWriter = csv.writer(uFile, delimiter = ',')
         for t in allEntries:
             temp = [t[0], t[1], str(t[2]).replace('$', '').replace(',',''), str(t[3]).replace('$','').replace(',',''), t[5]]
             cWriter.writerow(temp)
     uFile.close()
+    displayCurrentMonth()
 
 #endregion ButtonFunctions
 
 
-# Main Entry Buttons
+
+#region Main Entry Buttons
 addButton = Button(tableFrame, text = "Add expense", command = openAddMenu, font = usernameFont, height = 4, width = 15)
 addButton.grid(row = 3, column = 0, pady = 20)
 addButton.config(bg = '#40c25c')
