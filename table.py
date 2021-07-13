@@ -48,7 +48,8 @@ showFrame(budgetFrame)
 #region Frame configuration
 # Variables
 activeUser = "test"
-entries = []
+allEntries = []
+currentEntries = []
 
 tableFrame = Frame(budgetFrame, background = accentColor)
 tableFrame.place(height = 700, width = 1000, relx = 0.5, rely = 0.5, anchor = CENTER)
@@ -131,24 +132,31 @@ def toTuple(date, name, planned, actual, notes = ""):
 #Read in csv data to entries
 expenseCount = 0
 def readCSVtoTable():
+    global allEntries
+    allEntries = 0
     with open('UserData/'+ activeUser + '.csv', 'r') as file:
             reader = csv.reader(file)
             for line in reader:
                 tempTuple = toTuple(line[0], line[1], line[2], line[3], line[4])
-                entries.append(tempTuple)
+                allEntries.append(tempTuple)
 
 
 def displayCurrentMonth():
-    global expenseCount
+    global expenseCount, currentEntries
     expenseCount = 0
-    print(entries)
+    currentEntries = []
+
+    print(allEntries)
+
     for record in budgetTree.get_children():
             budgetTree.delete(record)
             expenseCount -= 1
-    for entry in entries:
+    for entry in allEntries:
         if str(entry[0][:2]) == viewMonth:
             budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = entry)
             expenseCount += 1
+
+
 
 readCSVtoTable()    
 displayCurrentMonth()
@@ -222,7 +230,7 @@ def openAddMenu():
         global expenseCount
         date = monthEntry + "/" + dayEntry + "/" + yearEntry
         budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
-        entries.append(toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
+        allEntries.append(toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()))
         expenseCount += 1
         with open('UserData/' + activeUser + '.csv', 'a', newline = '') as cFile:
             cWriter = csv.writer(cFile, delimiter=',')
@@ -241,14 +249,7 @@ def openAddMenu():
     cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
 
 
-# Update entry in table
-def updateExpense():
-    selected = budgetTree.focus()
-    date = umonthEntry + "/" + udayEntry + "/" + uyearEntry
 
-    # Save new info
-    budgetTree.item(selected, text = "", values = toTuple(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get()))
-    updateCSV()
 
 
 def openUpdateMenu():
@@ -311,6 +312,17 @@ def openUpdateMenu():
     updCal.grid(row = 0, column = 0, pady = 20, padx = 20, columnspan = 2, rowspan = 3)
     grabDate()
 
+    # Update entry in table
+    def updateExpense():
+        selected = budgetTree.focus()
+        date = umonthEntry + "/" + udayEntry + "/" + uyearEntry
+        tempTuple = toTuple(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get())
+        # Save new info
+        budgetTree.item(selected, text = "", values = tempTuple)
+
+        updateCSV()
+        displayCurrentMonth()
+        utop.destroy()
 
     updateButton = Button(utop, text = "Update Entry", command = updateExpense)
     updateButton.grid(row = 3, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = W)
@@ -363,7 +375,7 @@ def export():
 def updateCSV():
     with open('UserData/' + activeUser + '.csv', 'w', newline = '') as uFile:
         cWriter = csv.writer(uFile, delimiter = ',')
-        for t in entries:
+        for t in allEntries:
             temp = [t[0], t[1], str(t[2]).replace('$', '').replace(',',''), str(t[3]).replace('$','').replace(',',''), t[5]]
             cWriter.writerow(temp)
     uFile.close()
