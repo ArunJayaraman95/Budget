@@ -317,6 +317,7 @@ def openUpdateMenu():
         selected = budgetTree.focus()
         date = umonthEntry + "/" + udayEntry + "/" + uyearEntry
         tempTuple = toTuple(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get())
+        
         # Save new info
         budgetTree.item(selected, text = "", values = tempTuple)
         currentEntries = []
