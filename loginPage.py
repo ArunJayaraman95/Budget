@@ -7,6 +7,7 @@ import re
 import csv
 import smtplib, ssl
 import random, string
+from typing import ContextManager
 
 # Define colors
 mainColor = "#56C3A2"
@@ -32,12 +33,13 @@ root.columnconfigure(0, weight = 1)
 loginFrame = Frame(root, background = mainColor)
 registerFrame = Frame(root, background = mainColor)
 twoFactorFrame = Frame(root, background = mainColor)
+forgotFrame = Frame(root, background = mainColor)
 
-for frame in (loginFrame, registerFrame, twoFactorFrame):
+for frame in (loginFrame, registerFrame, twoFactorFrame, forgotFrame):
     frame.grid(row = 0, column = 0, sticky = "nsew")
 
-showFrame(registerFrame)
 
+showFrame(registerFrame)
 sx = root.winfo_screenwidth() 
 sy = root.winfo_screenheight()
 
@@ -51,13 +53,54 @@ root.iconbitmap("img/WayneStateLogo.ico")
 # Variables
 activeUser = ""
 
+
+
 # Functions
+
+
+def forgotPassword():
+    global activeUser
+    global savedUsername
+    print("Login submit button clicked")
+    userEntry = uInput.get()
+    savedUsername = userEntry
+
+
+    passEntry = pInput.get()
+    foundFlag = False
+    foundEmail = ""
+    # Check username
+    print("Userentry", userEntry, uInput.get())
+    with open('UserData/userList.csv', 'r') as file:
+        reader = csv.reader(file)
+        for line in reader:
+            print(line)
+            if line[0].lower().strip() == userEntry.lower():
+                print("In file")
+                foundFlag = True
+                activeUser = userEntry
+                foundEmail  = line[2].lower().strip();
+                #messagebox.showinfo("Success!", "Welcome " + activeUser + "!")
+                loginFrame.grid_forget()#Hide/destroy the registerframe
+                showFrame(forgotFrame)
+                global generatedPasswordCode
+                generatedPasswordCode = SendResetCode(foundEmail)
+                return
+                #break
+        if not foundFlag:
+            print("Username (" + userEntry + ") not found")
+            messagebox.showwarning("Warning", "User not found")         
+    uInput.delete(0, END)
+    pInput.delete(0, END)
+    print("Active user:", activeUser)
+
 def submitLogin():
     global activeUser
     print("Login submit button clicked")
     userEntry = uInput.get()
     passEntry = pInput.get()
     foundFlag = False
+    foundEmail = ""
     # Check username
     print("Userentry", userEntry, uInput.get())
     with open('UserData/userList.csv', 'r') as file:
@@ -68,29 +111,85 @@ def submitLogin():
                 print("In file")
                 foundFlag = True
                 activeUser = userEntry
-                messagebox.showinfo("Success!", "Welcome " + activeUser + "!")
-
-                #here
-                #code = SendTwoFactorCode("ffddfdf@dfdsf.com")
-                #steps
-                #build frame with input box and button
-                #show two factor authentication input box in frame
-                #add event trigger to button that when pressed chechs user input == code
-                #if UserAuthCode == code:
-                    #Leave
-                #else:
-                    #show error
-                
+                foundEmail  = line[2].lower().strip();
+                #messagebox.showinfo("Success!", "Welcome " + activeUser + "!")
+                registerFrame.grid_forget()#Hide/destroy the registerframe
+                showFrame(twoFactorFrame)
+                global generatedCode
+                generatedCode = SendTwoFactorCode(foundEmail)
                 break
         if not foundFlag:
             print("Username (" + userEntry + ") not found")
-            messagebox.showwarning("User not found")
-            #warningLabel = Label(loginMenu, text = "Incorrect credentials", fg = "#FF890A", bg = accentColor)
-            #warningLabel.config(font = ("Verdana", 12))
-            #warningLabel.grid(row = 6, column = 1)
+            messagebox.showwarning("Warning", "User not found")         
     uInput.delete(0, END)
     pInput.delete(0, END)
     print("Active user:", activeUser)
+
+
+
+
+def processUserEnteredCode():
+    print("Register account clicked")
+    global generatedCode
+    # Store entries
+    userCodeEntry = ecInput.get()
+    if userCodeEntry != generatedCode:
+        messagebox.showwarning("Invalid", "Please check the code in the email")
+    else:
+        messagebox.showwarning("Hooray", "Hooray!!")
+        
+        forgotFrame.grid_forget()#Hide/destroy the forgot frame
+        showFrame(loginFrame) 
+
+
+def processForgotCode():
+    global generatedPasswordCode
+    # Store entries
+    userCodeEntry = ecResetInput.get()
+    passResetEntry = prResetInput.get()
+    confResetEntry = pcResetInput.get()
+    
+    if passResetEntry != confResetEntry:
+        messagebox.showwarning("Invalid", "Passwords do not match")
+    elif userCodeEntry != generatedPasswordCode:
+        messagebox.showwarning("Invalid", "Please check the code in the email")
+    elif len(passResetEntry) >= 8 and uppercase_check(passResetEntry) and lowercase_check(passResetEntry) and digit_check(passResetEntry):
+        changePassword(passResetEntry)
+        messagebox.showwarning("Hooray", "Password has been updated.")
+        
+        forgotFrame.grid_forget()#Hide/destroy the registerframe
+        showFrame(loginFrame) 
+    else:
+        messagebox.showwarning("Alarm", "Password is weak \n Password Must be in \n 1) Minimum 8 characters.\n 2) The alphabets must be between [a-z].\n 3) At least one alphabet should be of Upper Case [A-Z].\n 4) At least 1 number or digit between [0-9].")
+   
+
+##test stuff
+
+
+
+def changePassword(newPassword):
+    global savedUsername
+    infile = open('UserData/userList.csv', 'r')
+    newText = ""
+    content = infile.readlines()
+    for line in content:
+        if savedUsername in line: ####
+            newText += line.split(",")[0]+","+newPassword +","+line.split(",")[2]
+        else:
+            newText += line 
+    infile.close()
+
+    outfile = open('UserData/userList.csv', 'w')
+    outfile.write(newText)
+    outfile.close()
+
+
+global savedUsername
+savedUsername ="ddddd"
+changePassword("bbbbb")
+
+
+
 
 # Create subframe
 widthAdjuster = 0.4
@@ -116,7 +215,9 @@ pInput = Entry(loginMenu, width = 20, font = inputFont, show = '*')
 pInput.grid(row = 4, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
 
 # Create buttons
-submitButton = Button(loginMenu, text = "Submit", bg = "#A9e451", padx = 10, pady = 0, font = ("Verdana", 15), command = submitLogin)
+forgotButton = Button(loginMenu, text = "Forgot Password", bg = "#A9e451", padx = 10, pady = 0, font = ("Verdana", 15), command = forgotPassword) #code here for new frame
+forgotButton.grid(row = 5, column = 0, padx = 20, pady = 10, sticky = 'ew')
+submitButton = Button(loginMenu, text = "Submit", bg = "#A9e451", padx = 10, pady = 0, font = ("Verdana", 15), command = submitLogin) #code here for new frame
 submitButton.grid(row = 5, column = 1, padx = 20, pady = 10, sticky = 'ew')
 registerButton = Button(loginMenu, text = "Make new account", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(registerFrame))
 registerButton.grid(row = 6, column = 0, padx = 20, pady = 10, sticky = 'ew')
@@ -185,20 +286,11 @@ def registerAccount():
                 messagebox.showwarning("Alarm", "Password is strong")
                 with open ('UserData/userList.csv', 'a') as file:
                     writer = csv.writer(file, lineterminator="\n")
-                    writer.writerow([userEntry, passEntry])
+                    writer.writerow([userEntry, passEntry,emailEntry])
                 print("User ", userEntry, "added!")
                 messagebox.showinfo("Success!", "User added!")
 
-                #to do move into success section
-                code = SendTwoFactorCode(emailEntry)
-                #steps
-                #build frame with input box and button
-                #show two factor authentication input box in frame
-                #add event trigger to button that when pressed chechs user input == code
-                #if UserAuthCode == code:
-                    #Leave
-                #else:
-                    #show error
+               
 
 
 
@@ -260,7 +352,7 @@ pcInput.grid(row = 8, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 
 
 
 #Create buttons
-confirmButton = Button(registerMenu, text = "Register", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = registerAccount)
+confirmButton = Button(registerMenu, text = "Register", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = registerAccount)#here code
 confirmButton.grid(row = 10, column = 1, padx = 20, pady = 10, sticky = 'ew')
 
 returnButton = Button(registerMenu, text = "Return to login", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(loginFrame))
@@ -298,10 +390,77 @@ def SendTwoFactorCode(email_recipent):
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, message)
     return code
+def SendResetCode(email_recipent):
+    code = randomword(10)
+    #do to make code random
+
+
+    port = 465  # For SSL
+    smtp_server = "smtp.gmail.com"
+    sender_email = "robiakther007@gmail.com"  # Enter your address
+    receiver_email = email_recipent # Enter receiver address
+    password = "ra101112"
+    message = """\
+    Subject: Hi there
+
+    The code to reset your password is """+ code + "."
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message)
+    return code
 
 widthAdjuster2 = 0.37
 heightAdjuster2 = 0.2
 
+
+
+
+
+
+#New Frame
+resetMenu = Frame(forgotFrame, bg = accentColor)
+resetMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
+# Create labels for resetMenun
+resetTitle = Label(resetMenu, text = "Reset Password Code Sent to Email:", font = ("Courier", 20), bg = accentColor)
+resetTitle.grid(row = 0, column = 0, padx = 10, pady = 10, columnspan = 2, sticky = "ew")
+
+enterresetcodeLabel = Label(resetMenu, text = "Enter code: ", font = usernameFont, bg = accentColor)
+enterresetcodeLabel.grid(row = 1, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = "w")
+
+# Create input box for Enter code
+ecResetInput = Entry(resetMenu, width = 20, font = inputFont)
+ecResetInput.grid(row = 2, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
+
+
+
+passwordResetLabel = Label(resetMenu, text = "new Password: ", font = usernameFont, bg = accentColor)
+passwordResetLabel.grid(row = 3, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'w')
+
+passwordResetConLabel = Label(resetMenu, text = "Confirm new Password: ", font = usernameFont, bg = accentColor)
+passwordResetConLabel.grid(row = 5, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'w')
+
+prResetInput = Entry(resetMenu, width = 20, font = inputFont, show = '*')
+prResetInput.grid(row = 4, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
+
+pcResetInput = Entry(resetMenu, width = 20, font = inputFont, show = '*')
+pcResetInput.grid(row = 6, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
+
+
+
+
+#Create buttons
+doneResetButton = Button(resetMenu, text = "Done", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = processForgotCode)
+doneResetButton.grid(row = 7, column = 0, padx = 20, pady = 10, sticky = 'ew')
+
+
+
+
+
+
+
+#New Frame
 factorMenu = Frame(twoFactorFrame, bg = accentColor)
 factorMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
 # Create labels for Two-Factor Authentication
@@ -316,6 +475,6 @@ ecInput = Entry(factorMenu, width = 20, font = inputFont)
 ecInput.grid(row = 2, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
 
 #Create buttons
-doneButton = Button(factorMenu, text = "Done", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = registerAccount)
-doneButton.grid(row = 3, column = 1, padx = 20, pady = 10, sticky = 'ew')
+doneButton = Button(factorMenu, text = "Done", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = processUserEnteredCode)
+doneButton.grid(row = 3, column = 0, padx = 20, pady = 10, sticky = 'ew')
 root.mainloop()
