@@ -48,6 +48,7 @@ showFrame(budgetFrame)
 #region Frame configuration
 # Variables
 activeUser = "test"
+income = 0
 allEntries = []
 currentEntries = []
 
@@ -65,6 +66,18 @@ budget_date_label.grid(row = 1, column = 0, pady = 10, padx = 10)
 
 viewMonthEntry = Entry(budgetFrame)
 viewMonthEntry.grid(row = 2, column = 0, pady = 10, padx = 10)
+
+incomeLabel = Label(budgetFrame, text = "Income Stream", bg = 'yellow')
+incomeLabel.grid(row = 4, column = 0, pady = 10, padx = 10)
+
+incomeEntry = Entry(budgetFrame)
+incomeEntry.grid(row = 5, column = 0, pady = 10, padx = 10)
+
+def setIncome():
+  income = incomeEntry.get()
+  incomeLabel.config(text = "Income: " + str(income))
+incomeButton = Button(budgetFrame, text = "View", command = setIncome)
+incomeButton.grid(row = 6, column = 0, pady = 10, padx = 10)
 
 # Set viewmonth to this number
 viewMonth = "07"
