@@ -8,6 +8,27 @@ import csv
 import smtplib, ssl
 import random, string
 from typing import ContextManager
+import pyrebase
+import urllib
+
+# Firebase Configuration
+firebaseConfig = {
+    "apiKey": "AIzaSyB07JiaeBfXONn4Sz4TvdJ4xWQqE3X21D8",
+    "authDomain": "budget-software.firebaseapp.com",
+    "databaseURL": "https://budget-software-default-rtdb.firebaseio.com/",
+    "projectId": "budget-software",
+    "storageBucket": "budget-software.appspot.com",
+    "messagingSenderId": "124067844106",
+    "appId": "1:124067844106:web:ccc1224030c1958a3a8ff3",
+    "measurementId": "G-8MHJ83WY4T"
+}
+
+firebase = pyrebase.initialize_app(firebaseConfig)
+
+db = firebase.database()
+auth = firebase.auth()
+storage = firebase.storage()
+
 
 # Define colors
 mainColor = "#56C3A2"
@@ -79,7 +100,7 @@ def forgotPassword():
                 print("In file")
                 foundFlag = True
                 activeUser = userEntry
-                foundEmail  = line[2].lower().strip();
+                foundEmail  = line[2].lower().strip()
                 #messagebox.showinfo("Success!", "Welcome " + activeUser + "!")
                 loginFrame.grid_forget()#Hide/destroy the registerframe
                 showFrame(forgotFrame)
@@ -99,28 +120,23 @@ def submitLogin():
     print("Login submit button clicked")
     userEntry = uInput.get()
     passEntry = pInput.get()
-    foundFlag = False
-    foundEmail = ""
-    # Check username
+
+    # Check credentials
     print("Userentry", userEntry, uInput.get())
-    with open('UserData/userList.csv', 'r') as file:
-        reader = csv.reader(file)
-        for line in reader:
-            print(line)
-            if line[0].lower().strip() == userEntry.lower() and line[1].strip() == passEntry:
-                print("In file")
-                foundFlag = True
-                activeUser = userEntry
-                foundEmail  = line[2].lower().strip();
-                #messagebox.showinfo("Success!", "Welcome " + activeUser + "!")
-                registerFrame.grid_forget()#Hide/destroy the registerframe
-                showFrame(twoFactorFrame)
-                global generatedCode
-                generatedCode = SendTwoFactorCode(foundEmail)
-                break
-        if not foundFlag:
-            print("Username (" + userEntry + ") not found")
-            messagebox.showwarning("Warning", "User not found")         
+    users = db.child('userList').get()
+    found = False
+    for user in users:
+      if user.val()['username'] == userEntry and user.val()['password'] == passEntry:
+        try:
+          auth.sign_in_with_email_and_password(user.val()['email'], passEntry)
+          messagebox.showinfo("Welcome!", "Signed in!")
+          found = True
+        except:
+          messagebox.showwarning("Warning", "Invalid credentials")
+    if found == False:
+      messagebox.showwarning("Warning", "Invalid credentials")
+
+    # Clear inputs
     uInput.delete(0, END)
     pInput.delete(0, END)
     print("Active user:", activeUser)
@@ -131,6 +147,7 @@ def submitLogin():
 def processUserEnteredCode():
     print("Register account clicked")
     global generatedCode
+
     # Store entries
     userCodeEntry = ecInput.get()
     if userCodeEntry != generatedCode:
@@ -164,8 +181,6 @@ def processForgotCode():
    
 
 ##test stuff
-
-
 
 def changePassword(newPassword):
     global savedUsername
@@ -289,16 +304,6 @@ def registerAccount():
                     writer.writerow([userEntry, passEntry,emailEntry])
                 print("User ", userEntry, "added!")
                 messagebox.showinfo("Success!", "User added!")
-
-               
-
-
-
-        
-
-
-
-
             
             else:
                 messagebox.showwarning("Alarm", "Password is weak \n Password Must be in \n 1) Minimum 8 characters.\n 2) The alphabets must be between [a-z].\n 3) At least one alphabet should be of Upper Case [A-Z].\n 4) At least 1 number or digit between [0-9].")
@@ -416,9 +421,6 @@ heightAdjuster2 = 0.2
 
 
 
-
-
-
 #New Frame
 resetMenu = Frame(forgotFrame, bg = accentColor)
 resetMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
@@ -448,16 +450,9 @@ pcResetInput = Entry(resetMenu, width = 20, font = inputFont, show = '*')
 pcResetInput.grid(row = 6, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
 
 
-
-
 #Create buttons
 doneResetButton = Button(resetMenu, text = "Done", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = processForgotCode)
 doneResetButton.grid(row = 7, column = 0, padx = 20, pady = 10, sticky = 'ew')
-
-
-
-
-
 
 
 #New Frame
