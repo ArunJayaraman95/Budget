@@ -69,8 +69,9 @@ class tkinterApp(tk.Tk):
 
 class StartPage(tk.Frame):
     category = {}
-
+    #This function is add and display category function
     def category(self):
+        ## This is where users see category category lists.
         def displayData():
             with open('CategoryData/categoryDataList.csv', 'r') as file:
                 category = csv.reader(file)
@@ -103,7 +104,7 @@ class StartPage(tk.Frame):
                     i = 0
                 j = 0
 
-        # This is where users can scroll through past receipts
+        # This is where users add new category
         def addCategory():
             categoryEntry1 = categoryInput1.get()
             categoryEntry2 = categoryInput2.get()
@@ -121,7 +122,7 @@ class StartPage(tk.Frame):
                     messagebox.showwarning("Error", "Amount only needs number")
             else:
                 messagebox.showwarning("Error", "Amount field reqired")
-
+        #Check the amount value and unit testing
         def digit_check(value):
             if re.search('[0-9]', value):  # atleast one digit
                 return True
