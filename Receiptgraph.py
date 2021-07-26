@@ -130,7 +130,7 @@ class StartPage(tk.Frame):
         categoryViewer = tk.Tk()
         categoryViewer.title("Category")
         categoryViewer.geometry('500x400')
-        categoryViewer['background'] = 'yellow'
+        categoryViewer['background'] = 'blue'
         # Create input box for Category and Amount
         categoryInput1 = ttk.Combobox(categoryViewer,
                                       values=[
