@@ -60,7 +60,7 @@ for frame in (loginFrame, registerFrame, twoFactorFrame, forgotFrame):
     frame.grid(row = 0, column = 0, sticky = "nsew")
 
 
-showFrame(registerFrame)
+showFrame(loginFrame)
 sx = root.winfo_screenwidth() 
 sy = root.winfo_screenheight()
 
@@ -240,8 +240,6 @@ registerButton.grid(row = 6, column = 0, padx = 20, pady = 10, sticky = 'ew')
 #endregion
 
 # ===============RegisterAccount Frame 2=====================#
-#####################################################################################################
-
 
 def uppercase_check(passEntry):
     if re.search('[A-Z]', passEntry): #atleast one uppercase character
@@ -260,13 +258,11 @@ def digit_check(passEntry):
 
 def check(email):   
     regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'  
+    # REFACTOR 
     if(re.search(regex,email)):
         return True
     else:
         return False 
-#####################################################################################################
-
-
 
 # Functions
 def registerAccount():
@@ -280,39 +276,40 @@ def registerAccount():
     foundFlag = False
 
     # Check username
-    with open('UserData/userList.csv', 'r') as file:
-        reader = csv.reader(file)
-        for line in reader:
-            print(line)
-            if line[0].lower().strip() == userEntry.lower():
-                print("User already exists")
-                foundFlag = True
+    userDB = db.child('userList').child(userEntry).get()
+    if userDB.val():
+        print(userDB)
+        foundFlag = True
                 
 
-        if not foundFlag:
+    if not foundFlag:
+        if not check(emailEntry):
+            messagebox.showwarning("Alarm", "Invalid Email")
             
-            if not  check(emailEntry):
-                    messagebox.showwarning("Alarm", "Invalid Email")
-               
-            elif passEntry != confEntry:
-                messagebox.showwarning("Error", "Passwords don't match")
-
-            elif len(passEntry) >= 8 and uppercase_check(passEntry) and lowercase_check(passEntry) and digit_check(passEntry):
-                messagebox.showwarning("Alarm", "Password is strong")
-                with open ('UserData/userList.csv', 'a') as file:
-                    writer = csv.writer(file, lineterminator="\n")
-                    writer.writerow([userEntry, passEntry,emailEntry])
+        elif passEntry != confEntry:
+            messagebox.showwarning("Error", "Passwords don't match")
+        # Good case
+        elif len(passEntry) >= 8 and uppercase_check(passEntry) and lowercase_check(passEntry) and digit_check(passEntry):
+            messagebox.showwarning("Alarm", "Password is strong")
+ 
+            try:
+                auth.create_user_with_email_and_password(emailEntry, passEntry)
+                print("Account made")
                 print("User ", userEntry, "added!")
                 messagebox.showinfo("Success!", "User added!")
+                data = {'email': emailEntry, 'password': passEntry, 'username': userEntry}
+                db.child('userList').child(userEntry).set(data)
+            except:
+                print("Email already exists")
+                messagebox.showwarning("Invalid", "Username or email is already in use. Try again.")
+
             
-            else:
-                messagebox.showwarning("Alarm", "Password is weak \n Password Must be in \n 1) Minimum 8 characters.\n 2) The alphabets must be between [a-z].\n 3) At least one alphabet should be of Upper Case [A-Z].\n 4) At least 1 number or digit between [0-9].")
-
-  
-
-   
+        else:
+            messagebox.showwarning("Alarm", "Password is weak \n Password Must be in \n 1) Minimum 8 characters.\n 2) The alphabets must be between [a-z].\n 3) At least one alphabet should be of Upper Case [A-Z].\n 4) At least 1 number or digit between [0-9].")
+    else:
+        messagebox.showwarning("Invalid", "Username or email is already in use. Try again.")
     urInput.delete(0, END)
-    emInput.delete(0,END)
+    emInput.delete(0, END)
     prInput.delete(0, END)
     pcInput.delete(0, END)
 
@@ -363,7 +360,7 @@ confirmButton.grid(row = 10, column = 1, padx = 20, pady = 10, sticky = 'ew')
 returnButton = Button(registerMenu, text = "Return to login", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(loginFrame))
 returnButton.grid(row = 10, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
-# ===============TwoFactorCode Frame 3=====================#
+#region===============TwoFactorCode Frame 3=====================#
 
 def randomword(length):
    letters = "1234567890abcdefghijklmnopqrstuvwxyz"
@@ -472,4 +469,8 @@ ecInput.grid(row = 2, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 
 #Create buttons
 doneButton = Button(factorMenu, text = "Done", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = processUserEnteredCode)
 doneButton.grid(row = 3, column = 0, padx = 20, pady = 10, sticky = 'ew')
+#endregion
+
+
+
 root.mainloop()
