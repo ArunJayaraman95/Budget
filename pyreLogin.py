@@ -15,11 +15,11 @@ firebaseConfig = {
 firebase = pyrebase.initialize_app(firebaseConfig)
 
 # db = firebase.database()
-# auth = firebase.auth()
+auth = firebase.auth()
 storage = firebase.storage()
 
-# Authentication
-# Login
+#Authentication
+#Login
 # email = input("Enter email: ")
 # password = input ("Enter password: ")
 # try:
@@ -29,14 +29,18 @@ storage = firebase.storage()
 #     print("Invalid credentials. Try again.")
 
 # Signup
-# email = input("Enter email: ")
-# password = input("Enter password: ")
-# confirmPassword = input("Re-enter password: ")
-# if password == confirmPassword:
-#     try:
-#         auth.create_user_with_email_and_password(email, password)
-#     except:
-#         print("Email already exists")
+email = input("Enter email: ")
+password = input("Enter password: ")
+confirmPassword = input("Re-enter password: ")
+if password == confirmPassword:
+    try:
+        auth.create_user_with_email_and_password(email, password)
+        print("Account made")
+    except:
+        print("Email already exists")
+else:
+  print("Passwords don't match try again")
+
 
 # Storage
 # fileName = input("Enter file name for upload: ")
@@ -47,9 +51,9 @@ storage = firebase.storage()
 # cloudFileName = input("Enter file to download: ")
 # storage.child(cloudFileName).download("", "dCars.txt")
 # print("Success")
-
+'''
 # Reading file
 cloudFileName = input("File to download")
 url = storage.child(cloudFileName).get_url(None)
 f = urllib.request.urlopen(url).read()
-print(f)
+print(f)'''
