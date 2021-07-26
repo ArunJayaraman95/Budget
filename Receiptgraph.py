@@ -160,13 +160,13 @@ class StartPage(tk.Frame):
 
         amountInput = Entry(categoryViewer, width=5)
         amountInput.grid(row=0, column=2, padx=10, pady=10, sticky='ew')
-
+        #checking if everything is working
         addButton = ttk.Button(categoryViewer, text="add", command=addCategory)
         addButton.grid(row=3, column=0, padx=10, pady=10)
-
+        # checking if everything is working
         refreshButton = ttk.Button(categoryViewer, text="refresh", command=displayData)
         refreshButton.grid(row=3, column=2, padx=10, pady=10)
-
+        # checking if everything is working
         function_name = "displayData"
         eval(function_name + "()")
 
