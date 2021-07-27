@@ -94,6 +94,13 @@ def totalIncome():
   income =1000
   expenses = sum([(float)(var[3].replace("$","")) for var in currentEntries])
   total = income - expenses
+  tkinter.messagebox.showinfo("Total", "Total: " + '${:,.2f}'.format(total))
+
+totalButton = Button(budgetFrame, text = "View Total", command = totalIncome)
+totalButton.grid(row = 9, column = 0, pady = 10, padx = 10)
+
+# Set viewmonth to this number
+viewMonth = "07"
 
 
 
