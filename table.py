@@ -68,8 +68,6 @@ showFrame(budgetFrame)
 # Variables
 activeUser = "test"
 income = 0
-allEntries = []
-currentEntries = []
 
 tableFrame = Frame(budgetFrame, background = accentColor)
 tableFrame.place(height = 700, width = 1000, relx = 0.5, rely = 0.5, anchor = CENTER)
@@ -204,7 +202,7 @@ def displayCurrentMonth():
             budgetTree.insert(parent = '', index = 'end', iid = expense.key(), values = tempTuple)
 
 
-#readCSVtoTable()    
+   
 displayCurrentMonth()
 
 # Pack table
@@ -359,7 +357,6 @@ def openUpdateMenu():
 
     # Update entry in table
     def updateExpense():
-        global currentEntries
         selected = budgetTree.focus()
         date = umonthEntry + "/" + udayEntry + "/" + uyearEntry
         n = unameEntry.get()
@@ -424,35 +421,36 @@ def export():
     s1.write(rnum, cnum + 5, "Difference", bold)
     s1.write(rnum, cnum + 6, "Notes", bold)
     rnum += 1
-    with open('UserData/'+activeUser+'.csv', 'r') as file:
-        reader = csv.reader(file)
-        for d, n, p, a, m in reader:
-            s1.write(rnum, cnum + 1, d)
-            s1.write(rnum, cnum + 2, n)
-            s1.write(rnum, cnum + 3, float(p))
-            s1.write(rnum, cnum + 4, float(a))
-            s1.write(rnum, cnum + 5, float(p)-float(a))
-            s1.write(rnum, cnum + 6, m)
+    for expense in db.child('userList').child(activeUser).child('expenses').get():
+        print(expense.val()['actual'])
+        if expense.val()['date'][:2] == viewMonth:
+            s1.write(rnum, cnum + 1, expense.val()['date'])
+            s1.write(rnum, cnum + 2, expense.val()['name'])
+            s1.write(rnum, cnum + 3, float(expense.val()['planned']))
+            s1.write(rnum, cnum + 4, float(expense.val()['actual']))
+            s1.write(rnum, cnum + 5, float(expense.val()['planned'])-float(expense.val()['actual']))
+            s1.write(rnum, cnum + 6, expense.val()['notes'])
             rnum += 1
+
     newXS.close()
 
 
 # Update CSV with current table data
-def updateCSV():
-    global allEntries, currentEntries
-    allEntries = allEntries + currentEntries
-    currentEntries = []
+# def updateCSV():
+#     global allEntries, currentEntries
+#     allEntries = allEntries + currentEntries
+#     currentEntries = []
 
-    # Open user file and write in all update entries into file
-    with open('UserData/' + activeUser + '.csv', 'w', newline = '') as uFile:
-        cWriter = csv.writer(uFile, delimiter = ',')
-        for t in allEntries:
-            temp = [t[0], t[1], str(t[2]).replace('$', '').replace(',',''), str(t[3]).replace('$','').replace(',',''), t[5]]
-            cWriter.writerow(temp)
+#     # Open user file and write in all update entries into file
+#     with open('UserData/' + activeUser + '.csv', 'w', newline = '') as uFile:
+#         cWriter = csv.writer(uFile, delimiter = ',')
+#         for t in allEntries:
+#             temp = [t[0], t[1], str(t[2]).replace('$', '').replace(',',''), str(t[3]).replace('$','').replace(',',''), t[5]]
+#             cWriter.writerow(temp)
 
-    # Close file and redisplay table
-    uFile.close()
-    displayCurrentMonth()
+#     # Close file and redisplay table
+#     uFile.close()
+#     displayCurrentMonth()
 
 #endregion ButtonFunctions
 
