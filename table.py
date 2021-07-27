@@ -103,7 +103,7 @@ incomeButton.grid(row = 6, column = 0, pady = 10, padx = 10)
 
 
 # Set VIEWMONTH to this number
-viewMonth = "07"
+viewMonth = "06"
 
 
 
@@ -129,9 +129,8 @@ confirmViewMonth.grid(row = 3, column = 0, pady = 10, padx = 10)
 # Scrollbar and table setup
 tableScroll = ttk.Scrollbar(viewFrame, orient = 'vertical')
 tableScroll.pack(side = RIGHT, fill = Y)
-budgetTree = ttk.Treeview(viewFrame, yscrollcommand= tableScroll.set)
+budgetTree = ttk.Treeview(viewFrame, yscrollcommand= tableScroll.set, selectmode = 'browse')
 tableScroll.config(command = budgetTree.yview)
-
 # Define columns
 budgetTree['columns'] = ("Date", "Name", "Planned", "Actual", "Difference", "Notes")
 
@@ -173,19 +172,20 @@ def toTuple(date, name, planned, actual, notes = ""):
     return (a, b, c, d, e, f)
 
 
+# DELETE IF NOT NEEDED
 #Read in all data
-expenseCount = 0
-def readCSVtoTable():
-    expenses = db.child('userList').child(activeUser).child('expenses').get()
-    for expense in expenses:
-        d = expense.val()['date']
-        n = expense.val()['name']
-        p = expense.val()['planned']
-        a = expense.val()['actual']
-        m = expense.val()['notes']
+# expenseCount = 0
+# def readCSVtoTable():
+#     expenses = db.child('userList').child(activeUser).child('expenses').get()
+#     for expense in expenses:
+#         d = expense.val()['date']
+#         n = expense.val()['name']
+#         p = expense.val()['planned']
+#         a = expense.val()['actual']
+#         m = expense.val()['notes']
 
-        tempTuple = toTuple(d, n, p, a, m)
-        allEntries.append(tempTuple)
+#         tempTuple = toTuple(d, n, p, a, m)
+#         allEntries.append(tempTuple)
 
 def displayCurrentMonth():
     # Clear out table
@@ -270,20 +270,19 @@ def openAddMenu():
 
         # Format date
         date = monthEntry + "/" + dayEntry + "/" + yearEntry
-        tempTuple = toTuple(date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get())
+        n = nameEntry.get()
+        p = plannedEntry.get()
+        a = actualEntry.get()
+        m = notesEntry.get()
 
+        tempTuple = toTuple(date, n, p, a, m)
+        data = {'date': date, 'name': n, 'planned': p, 'actual': a, 'notes': m, 'category': ""}
         # Insert entry into table
-        budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = tempTuple)
-        currentEntries.append(tempTuple)
-        expenseCount += 1
+        tempIID = db.child("userList").child('test').child('expenses').push(data)
+        budgetTree.insert(parent = '', index = 'end', iid = tempIID['name'], values = tempTuple)
+        print(tempIID['name'])
 
-        # Write to csv
-        with open('UserData/' + activeUser + '.csv', 'a', newline = '') as cFile:
-            cWriter = csv.writer(cFile, delimiter=',')
-            cWriter.writerow([date, nameEntry.get(), plannedEntry.get(), actualEntry.get(), notesEntry.get()])
 
-        # Update CSV, display updated table, and close "add entry" window
-        updateCSV()
         displayCurrentMonth()
         top.destroy()
 
@@ -363,17 +362,20 @@ def openUpdateMenu():
         global currentEntries
         selected = budgetTree.focus()
         date = umonthEntry + "/" + udayEntry + "/" + uyearEntry
-        tempTuple = toTuple(date, unameEntry.get(), uplannedEntry.get(), uactualEntry.get(), unotesEntry.get())
-
+        n = unameEntry.get()
+        p = uplannedEntry.get()
+        a = uactualEntry.get()
+        m = unotesEntry.get()
+        tempTuple = toTuple(date, n, p, a, m)
+        data = {'date': date, 'name': n, 'planned': p, 'actual': a, 'notes': m, 'category': ""}
+        for record in budgetTree.selection():
+            item = budgetTree.item(record)
+            iid = budgetTree.focus()
+            for exp in db.child('userList').child(activeUser).child('expenses').get():
+                db.child('userList').child(activeUser).child('expenses').child(iid).update(data)
+        # Update table, display updated table, and destroy "update" window
         # Save new info
         budgetTree.item(selected, text = "", values = tempTuple)
-        currentEntries = []
-        for t in budgetTree.get_children():
-            x = budgetTree.item(t, 'values')
-            currentEntries.append(x)
-
-        # Update CSV, display updated table, and destroy "update" window
-        updateCSV()
         displayCurrentMonth()
         utop.destroy()
 
