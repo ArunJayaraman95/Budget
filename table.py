@@ -90,6 +90,10 @@ totalLabel.grid(row = 7, column = 0, pady = 10, padx = 10)
 
 totalEntry = Entry(budgetFrame)
 totalEntry.grid(row = 8, column = 0, pady = 10, padx = 10)
+def totalIncome():
+  income =1000
+  expenses = sum([(float)(var[3].replace("$","")) for var in currentEntries])
+  total = income - expenses
 
 
 
