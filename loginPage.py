@@ -36,10 +36,11 @@ root.columnconfigure(0, weight = 1)
 
 loginFrame = Frame(root, background = mainColor)
 registerFrame = Frame(root, background = mainColor)
+homeFrame = Frame(root, background = mainColor)
 twoFactorFrame = Frame(root, background = mainColor)
 forgotFrame = Frame(root, background = mainColor)
 
-for frame in (loginFrame, registerFrame, twoFactorFrame, forgotFrame):
+for frame in (loginFrame, registerFrame, twoFactorFrame, forgotFrame, homeFrame):
     frame.grid(row = 0, column = 0, sticky = "nsew")
 
 
@@ -59,7 +60,15 @@ activeUser = ""
 
 
 
-# Functions
+#Functions
+
+def logoutPressed():
+    global activeUser
+    showFrame(loginFrame)
+    activeUser = ""
+
+def showhome():
+    showFrame(homeFrame)
 
 
 def forgotPassword():
