@@ -1,4 +1,4 @@
-# Imports
+#region Imports and Config
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
@@ -8,6 +8,7 @@ import xlsxwriter as xw
 import pyrebase
 import urllib
 
+# Firebase configuration
 firebaseConfig = {
     "apiKey": "AIzaSyB07JiaeBfXONn4Sz4TvdJ4xWQqE3X21D8",
     "authDomain": "budget-software.firebaseapp.com",
@@ -25,7 +26,6 @@ db = firebase.database()
 auth = firebase.auth()
 storage = firebase.storage()
 
-#region Window Config
 # Define colors
 mainColor = "#70A0A2"
 accentColor = "#57729E"
@@ -36,7 +36,7 @@ inputFont = ("Verdana", 20)
 usernameFont = ("Verdana", 16)
 aFont = ("Times New Roman", 20)
 
-
+# Function to display new page(frame)
 def showFrame(frame):
     frame.tkraise()
 
@@ -61,8 +61,7 @@ budgetFrame.grid(row = 0, column = 0, sticky = "nsew")
 showFrame(budgetFrame)
 #endregion Window config
 
-#region Frame1
-#============Frame 1 ==============# 
+#region ========= Frame 1 ============# 
 
 #region Frame configuration
 # Variables
@@ -97,16 +96,8 @@ incomeButton = Button(budgetFrame, text = "View", command = setIncome)
 incomeButton.grid(row = 6, column = 0, pady = 10, padx = 10)
 
 
-
-
-
 # Set VIEWMONTH to this number
 viewMonth = "06"
-
-
-
-
-
 
 # Function to switch table based on viewMonthEntry
 def updateTable():
@@ -170,21 +161,6 @@ def toTuple(date, name, planned, actual, notes = ""):
     return (a, b, c, d, e, f)
 
 
-# DELETE IF NOT NEEDED
-#Read in all data
-# expenseCount = 0
-# def readCSVtoTable():
-#     expenses = db.child('userList').child(activeUser).child('expenses').get()
-#     for expense in expenses:
-#         d = expense.val()['date']
-#         n = expense.val()['name']
-#         p = expense.val()['planned']
-#         a = expense.val()['actual']
-#         m = expense.val()['notes']
-
-#         tempTuple = toTuple(d, n, p, a, m)
-#         allEntries.append(tempTuple)
-
 def displayCurrentMonth():
     # Clear out table
     for record in budgetTree.get_children():
@@ -208,9 +184,9 @@ displayCurrentMonth()
 # Pack table
 budgetTree.pack()
 
-#region Button Functions
-# ========= Button functions =========== #
+#endregion
 
+#region ===== Button functions ====== #
 
 # Open add entry window
 def openAddMenu():
@@ -222,6 +198,7 @@ def openAddMenu():
     addCal = Calendar(top, selectmode = 'day', year = 2021, month = 6, day = 22, date_pattern = 'mm/dd/yyyy')
     addCal.grid(row = 0, column = 0, pady = 20, padx = 20, columnspan = 2, rowspan = 3)
 
+    # Entry variables
     global monthEntry, dayEntry, yearEntry
     global nameEntry, plannedEntry, actualEntry, notesEntry
     
@@ -236,7 +213,6 @@ def openAddMenu():
         monthEntry = selectedDate[:2]
         dayEntry = selectedDate[3:5]
         yearEntry = selectedDate[-4:]
-
 
     # Buttons, labels, and entry widgets
     getDateButton = Button(top, text = "Use this date", command = grabDate)
@@ -264,23 +240,23 @@ def openAddMenu():
     
     # Add expense to table
     def addExpense():
-        global expenseCount
 
-        # Format date
+        # Format date and get other params
         date = monthEntry + "/" + dayEntry + "/" + yearEntry
         n = nameEntry.get()
         p = plannedEntry.get()
         a = actualEntry.get()
         m = notesEntry.get()
 
+        # Format data for additions into table/DB
         tempTuple = toTuple(date, n, p, a, m)
         data = {'date': date, 'name': n, 'planned': p, 'actual': a, 'notes': m, 'category': ""}
-        # Insert entry into table
+
+        # Insert entry into DB and table
         tempIID = db.child("userList").child('test').child('expenses').push(data)
         budgetTree.insert(parent = '', index = 'end', iid = tempIID['name'], values = tempTuple)
-        print(tempIID['name'])
 
-
+        # Update Table
         displayCurrentMonth()
         top.destroy()
 
@@ -291,12 +267,15 @@ def openAddMenu():
     cancelAddButton = Button(top, text = "Cancel", command = lambda: top.destroy())
     cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 30, ipady = 20, pady = 10, sticky = NW)
 
+
 # Open update window
 def openUpdateMenu():
+    # Configuration
     utop = Toplevel()
     utop.geometry("%dx%d" % (sx*.25, sy*0.6))
     utop.config(background = accentColor)
 
+    # Get entries
     global umonthEntry, udayEntry, uyearEntry
     global unameEntry, uplannedEntry, uactualEntry, unotesEntry
     
@@ -311,7 +290,6 @@ def openUpdateMenu():
         umonthEntry = selectedDate[:2]
         udayEntry = selectedDate[3:5]
         uyearEntry = selectedDate[-4:]
-
 
     # Buttons, labels and entry widgets
     getDateButton = Button(utop, text = "Use this date", command = grabDate)
@@ -347,12 +325,13 @@ def openUpdateMenu():
     uactualEntry.insert(0, tempValues[3].replace('$',''))
     unotesEntry.insert(0, tempValues[5])
 
-    # Parse data (REFACTOR with split method!) to set calendar
-    tm = tempValues[0][:2]
-    td = tempValues[0][3:5]
-    ty = tempValues[0][-4:]
+    # Parse data to set calendar
+    tm, td, ty = tempValues[0].split(sep = '/')
+
     updCal = Calendar(utop, selectmode = 'day', year = int(ty), month = int(tm), day = int(td), date_pattern = 'mm/dd/yyyy')
     updCal.grid(row = 0, column = 0, pady = 20, padx = 20, columnspan = 2, rowspan = 3)
+
+    # Grab the new date
     grabDate()
 
     # Update entry in table
@@ -363,15 +342,19 @@ def openUpdateMenu():
         p = uplannedEntry.get()
         a = uactualEntry.get()
         m = unotesEntry.get()
+
+        # Format data
         tempTuple = toTuple(date, n, p, a, m)
         data = {'date': date, 'name': n, 'planned': p, 'actual': a, 'notes': m, 'category': ""}
+
+        # Update the database record
         for record in budgetTree.selection():
             item = budgetTree.item(record)
             iid = budgetTree.focus()
             for exp in db.child('userList').child(activeUser).child('expenses').get():
                 db.child('userList').child(activeUser).child('expenses').child(iid).update(data)
-        # Update table, display updated table, and destroy "update" window
-        # Save new info
+        
+        # Update table and destroy "update" window
         budgetTree.item(selected, text = "", values = tempTuple)
         displayCurrentMonth()
         utop.destroy()
@@ -384,25 +367,29 @@ def openUpdateMenu():
     cancelAddButton.grid(row = 5, column = 3, rowspan = 2, columnspan = 3, ipadx = 45, ipady = 20, pady = 10, sticky = W)
 
 
-# Remove expense from table (CHECK IF WORKING)
+# Remove expense
 def deleteExpense():
-    global expenseCount
+    # In the selection from table
     for expense in budgetTree.selection():
+
+        # Get the iid (unique database key for the expense)
         item = budgetTree.item(expense)
         iid = budgetTree.focus()
-        print('iid = ', iid, "item = ", item)
-    c = messagebox.askokcancel("Warning", "Are you sure you want to delete selected item(s)? (This cannot be undone)")
-    if c:
-        for record in budgetTree.selection():
-            item = budgetTree.item(record)
-            iid = budgetTree.focus()
-            for exp in db.child('userList').child(activeUser).child('expenses').get():
-                if exp.key() == iid:
-                    print("EOFISJPFOIJES YESSS")
-                    db.child("userList").child(activeUser).child('expenses').child(iid).remove()
-                    print(iid, exp.key())
-            budgetTree.delete(record)
+        # Popup to confirm action
+        c = messagebox.askokcancel("Warning", "Are you sure you want to delete selected item(s)? (This cannot be undone)")
 
+        # If action approved
+        if c:
+            # Delete unique expense from database
+            for record in budgetTree.selection():
+                item = budgetTree.item(record)
+                iid = budgetTree.focus()
+                for exp in db.child('userList').child(activeUser).child('expenses').get():
+                    # Make sure the key in DB matches the iid
+                    if exp.key() == iid:
+                        db.child("userList").child(activeUser).child('expenses').child(iid).remove()
+                        print(iid, exp.key())
+                budgetTree.delete(record)
 
 
 # Export file as xlsx
@@ -421,6 +408,8 @@ def export():
     s1.write(rnum, cnum + 5, "Difference", bold)
     s1.write(rnum, cnum + 6, "Notes", bold)
     rnum += 1
+
+    # For ALL expenses in DB with correct month
     for expense in db.child('userList').child(activeUser).child('expenses').get():
         print(expense.val()['actual'])
         if expense.val()['date'][:2] == viewMonth:
@@ -434,27 +423,7 @@ def export():
 
     newXS.close()
 
-
-# Update CSV with current table data
-# def updateCSV():
-#     global allEntries, currentEntries
-#     allEntries = allEntries + currentEntries
-#     currentEntries = []
-
-#     # Open user file and write in all update entries into file
-#     with open('UserData/' + activeUser + '.csv', 'w', newline = '') as uFile:
-#         cWriter = csv.writer(uFile, delimiter = ',')
-#         for t in allEntries:
-#             temp = [t[0], t[1], str(t[2]).replace('$', '').replace(',',''), str(t[3]).replace('$','').replace(',',''), t[5]]
-#             cWriter.writerow(temp)
-
-#     # Close file and redisplay table
-#     uFile.close()
-#     displayCurrentMonth()
-
 #endregion ButtonFunctions
-
-
 
 #region Main Entry Buttons
 addButton = Button(tableFrame, text = "Add expense", command = openAddMenu, font = usernameFont, height = 4, width = 15)
@@ -476,10 +445,6 @@ convertButton.grid(row = 0, column = 0, pady = 0)
 style = ttk.Style()
 style.configure("Treeview.Heading", font=(None, 12))
 style.configure("Treeview", font = ("Verdana", 16), rowheight = 50)
-
-
-# KEEP THIS CALENDAR. FOR SOME REASON CODE GLITCHES W/O IT EVEN THOUGH IT'S NOT EVEN PACKED IN
-cal = Calendar(root)
 
 #endregion
 
