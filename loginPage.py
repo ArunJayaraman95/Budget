@@ -149,9 +149,9 @@ def submitLogin():
                 showFrame(budgetFrame)
                 displayCurrentMonth()
             except:
-                messagebox.showwarning("Warning", "Invalid 1credentials")
+                messagebox.showwarning("Warning", "Error occurred")
     if found == False:
-      messagebox.showwarning("Warning", "Invalid 3credentials")
+      messagebox.showwarning("Warning", "Invalid credentials")
 
         
     uInput.delete(0, END)
@@ -532,18 +532,21 @@ incomeButton.grid(row = 6, column = 0, pady = 10, padx = 10)
 viewMonth = "06"
 
 # Function to switch table based on viewMonthEntry
-def updateTable():
+def updateTable(vm):
     global viewMonth
-    vm = viewMonthEntry.get()
-    if int(vm) >= 1 and int(vm) <= 12:
-        if len(vm) == 1:
-            vm = '0' + vm
-        viewMonth = vm
-        displayCurrentMonth()
-    else:
+    try:
+        if int(vm) >= 1 and int(vm) <= 12:
+            if len(vm) == 1:
+                vm = '0' + vm
+            viewMonth = vm
+            displayCurrentMonth()
+            return 0
+        return -1
+    except:
         messagebox.showwarning("Invalid Input!", "Month must be an integer from 1 to 12")
+        return -1
 
-confirmViewMonth = Button(budgetFrame, text = "View", command = updateTable)
+confirmViewMonth = Button(budgetFrame, text = "View", command = lambda: updateTable(viewMonthEntry.get()))
 confirmViewMonth.grid(row = 3, column = 0, pady = 10, padx = 10)
 
 
@@ -887,6 +890,10 @@ style.configure("Treeview", font = ("Verdana", 16), rowheight = 50)
 #endregion
 
 #endregion
-
+def grabDate(selectedDate):
+    monthEntry = selectedDate[:2]
+    dayEntry = selectedDate[3:5]
+    yearEntry = selectedDate[-4:]
+    return [monthEntry, dayEntry, yearEntry]
 
 root.mainloop()
