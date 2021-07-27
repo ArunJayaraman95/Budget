@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import messagebox
 import tkinter.font as font
 import re
-#from PIL import ImageTk, Image
+from PIL import ImageTk, Image
 import csv
 import smtplib, ssl
 import random, string
@@ -18,8 +18,12 @@ buttonFont = ("Helvetica", 20)
 inputFont = ("Verdana", 16)
 usernameFont = ("Verdana", 12)
 
-def showFrame(frame):
-    frame.tkraise()
+def showFrame(frame_1):
+    frames =[loginFrame, registerFrame, twoFactorFrame, forgotFrame, homeFrame]
+    frames.remove(frame_1)
+    for frame in frames:
+        frame.lower()
+    frame_1.lift()
 
 # Creating window
 root=Tk()
@@ -419,7 +423,7 @@ heightAdjuster2 = 0.2
 
 
 
-#New Frame
+#New Frame for Forgot password
 resetMenu = Frame(forgotFrame, bg = accentColor)
 resetMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
 # Create labels for resetMenun
@@ -460,7 +464,7 @@ doneResetButton.grid(row = 7, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
 
 
-#New Frame
+#New Frame for Two factor
 factorMenu = Frame(twoFactorFrame, bg = accentColor)
 factorMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
 # Create labels for Two-Factor Authentication
