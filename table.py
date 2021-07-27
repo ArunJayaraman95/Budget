@@ -5,6 +5,25 @@ from tkinter import ttk
 import csv
 from tkcalendar import *
 import xlsxwriter as xw
+import pyrebase
+import urllib
+
+firebaseConfig = {
+    "apiKey": "AIzaSyB07JiaeBfXONn4Sz4TvdJ4xWQqE3X21D8",
+    "authDomain": "budget-software.firebaseapp.com",
+    "databaseURL": "https://budget-software-default-rtdb.firebaseio.com/",
+    "projectId": "budget-software",
+    "storageBucket": "budget-software.appspot.com",
+    "messagingSenderId": "124067844106",
+    "appId": "1:124067844106:web:ccc1224030c1958a3a8ff3",
+    "measurementId": "G-8MHJ83WY4T"
+}
+
+firebase = pyrebase.initialize_app(firebaseConfig)
+
+db = firebase.database()
+auth = firebase.auth()
+storage = firebase.storage()
 
 #region Window Config
 # Define colors
@@ -79,8 +98,17 @@ def setIncome():
 incomeButton = Button(budgetFrame, text = "View", command = setIncome)
 incomeButton.grid(row = 6, column = 0, pady = 10, padx = 10)
 
-# Set viewmonth to this number
+
+
+
+
+# Set VIEWMONTH to this number
 viewMonth = "07"
+
+
+
+
+
 
 # Function to switch table based on viewMonthEntry
 def updateTable():
@@ -145,41 +173,38 @@ def toTuple(date, name, planned, actual, notes = ""):
     return (a, b, c, d, e, f)
 
 
-#Read in csv data to entries
+#Read in all data
 expenseCount = 0
 def readCSVtoTable():
-    global allEntries
-    allEntries = []
-    with open('UserData/'+ activeUser + '.csv', 'r') as file:
-            reader = csv.reader(file)
-            for line in reader:
-                tempTuple = toTuple(line[0], line[1], line[2], line[3], line[4])
-                allEntries.append(tempTuple)
+    expenses = db.child('userList').child(activeUser).child('expenses').get()
+    for expense in expenses:
+        d = expense.val()['date']
+        n = expense.val()['name']
+        p = expense.val()['planned']
+        a = expense.val()['actual']
+        m = expense.val()['notes']
 
+        tempTuple = toTuple(d, n, p, a, m)
+        allEntries.append(tempTuple)
 
 def displayCurrentMonth():
-    global expenseCount, currentEntries, allEntries
-    expenseCount = 0
-
-    allEntries = allEntries + currentEntries
-
-    # Separate viewable entries by month
-    currentEntries = [x for x in allEntries if x[0][:2] == viewMonth]
-    allEntries = [x for x in allEntries if x[0][:2] != viewMonth]
-
     # Clear out table
     for record in budgetTree.get_children():
             budgetTree.delete(record)
-            expenseCount -= 1
 
-    # For every entry in current entries add it to table
-    for entry in currentEntries:
-        budgetTree.insert(parent = '', index = 'end', iid = expenseCount, values = entry)
-        expenseCount += 1
+    expenses = db.child('userList').child(activeUser).child('expenses').get()
+    for expense in expenses:
+        d = expense.val()['date']
+        n = expense.val()['name']
+        p = expense.val()['planned']
+        a = expense.val()['actual']
+        m = expense.val()['notes']
+        if d[:2] == viewMonth:
+            tempTuple = toTuple(d, n, p, a, m)
+            budgetTree.insert(parent = '', index = 'end', iid = expense.key(), values = tempTuple)
 
 
-
-readCSVtoTable()    
+#readCSVtoTable()    
 displayCurrentMonth()
 
 # Pack table
