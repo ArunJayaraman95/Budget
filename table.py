@@ -74,8 +74,8 @@ incomeEntry = Entry(budgetFrame)
 incomeEntry.grid(row = 5, column = 0, pady = 10, padx = 10)
 
 def setIncome():
-  income = incomeEntry.get()
-  incomeLabel.config(text = "Income: " + str(income))
+    income = incomeEntry.get()
+    incomeLabel.config(text = "Income: " + str(income))
 incomeButton = Button(budgetFrame, text = "View", command = setIncome)
 incomeButton.grid(row = 6, column = 0, pady = 10, padx = 10)
 
