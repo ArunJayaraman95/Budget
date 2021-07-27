@@ -388,12 +388,22 @@ def openUpdateMenu():
 # Remove expense from table (CHECK IF WORKING)
 def deleteExpense():
     global expenseCount
+    for expense in budgetTree.selection():
+        item = budgetTree.item(expense)
+        iid = budgetTree.focus()
+        print('iid = ', iid, "item = ", item)
     c = messagebox.askokcancel("Warning", "Are you sure you want to delete selected item(s)? (This cannot be undone)")
     if c:
         for record in budgetTree.selection():
+            item = budgetTree.item(record)
+            iid = budgetTree.focus()
+            for exp in db.child('userList').child(activeUser).child('expenses').get():
+                if exp.key() == iid:
+                    print("EOFISJPFOIJES YESSS")
+                    db.child("userList").child(activeUser).child('expenses').child(iid).remove()
+                    print(iid, exp.key())
             budgetTree.delete(record)
-            expenseCount -= 1
-    updateCSV()
+
 
 
 # Export file as xlsx
