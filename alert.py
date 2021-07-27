@@ -14,3 +14,5 @@ def alertSend_Email(to, subject, message):
     message = "Subject: """+subject+"\n"+message
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message)
