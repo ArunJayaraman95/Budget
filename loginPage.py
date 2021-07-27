@@ -51,6 +51,7 @@ root.state("zoomed")  #Makes it fullscreen automatically
 root.rowconfigure(0, weight = 1)
 root.columnconfigure(0, weight = 1)
 
+# Frames
 loginFrame = Frame(root, background = mainColor)
 registerFrame = Frame(root, background = mainColor)
 twoFactorFrame = Frame(root, background = mainColor)
@@ -78,47 +79,59 @@ activeUser = ""
 
 # Functions
 
+generatedCode = ""
 
 def forgotPassword():
     global activeUser
     global savedUsername
     print("Login submit button clicked")
-    userEntry = uInput.get()
+    userEntry = uInput.get().lower()
     savedUsername = userEntry
 
-
-    passEntry = pInput.get()
     foundFlag = False
-    foundEmail = ""
     # Check username
-    print("Userentry", userEntry, uInput.get())
-    with open('UserData/userList.csv', 'r') as file:
-        reader = csv.reader(file)
-        for line in reader:
-            print(line)
-            if line[0].lower().strip() == userEntry.lower():
-                print("In file")
-                foundFlag = True
-                activeUser = userEntry
-                foundEmail  = line[2].lower().strip()
-                #messagebox.showinfo("Success!", "Welcome " + activeUser + "!")
-                loginFrame.grid_forget()#Hide/destroy the registerframe
-                showFrame(forgotFrame)
-                global generatedPasswordCode
-                generatedPasswordCode = SendResetCode(foundEmail)
-                return
-                #break
-        if not foundFlag:
-            print("Username (" + userEntry + ") not found")
-            messagebox.showwarning("Warning", "User not found")         
+    # print("Userentry", userEntry, uInput.get())
+    # with open('UserData/userList.csv', 'r') as file:
+    #     reader = csv.reader(file)
+    #     for line in reader:
+    #         print(line)
+    #         if line[0].lower().strip() == userEntry.lower():
+    #             print("In file")
+    #             foundFlag = True
+    #             activeUser = userEntry
+    #             foundEmail  = line[2].lower().strip()
+    #             #messagebox.showinfo("Success!", "Welcome " + activeUser + "!")
+    #             #loginFrame.grid_forget()#Hide/destroy the registerframe
+    #             showFrame(forgotFrame)
+    #             global generatedPasswordCode
+    #             generatedPasswordCode = SendResetCode(foundEmail)
+    #             return
+    #             #break
+    #     if not foundFlag:
+    #         print("Username (" + userEntry + ") not found")
+    #         messagebox.showwarning("Warning", "User not found")   
+    
+    if db.child('userList').child(userEntry).get().val():
+        foundFlag = True   
+
+    if foundFlag:
+        foundEmail = db.child('userList').child(userEntry).child('email').get()
+        showFrame(forgotFrame)
+        global generatedPasswordCode
+        generatedPasswordCode = SendResetCode(foundEmail)
+    else:
+        print("Username (" + userEntry + ") not found")
+        messagebox.showwarning("Warning", "User not found")
+
     uInput.delete(0, END)
     pInput.delete(0, END)
     print("Active user:", activeUser)
 
+
 def submitLogin():
     global activeUser
     print("Login submit button clicked")
-    userEntry = uInput.get()
+    userEntry = uInput.get().lower()
     passEntry = pInput.get()
 
     # Check credentials
@@ -140,8 +153,6 @@ def submitLogin():
     uInput.delete(0, END)
     pInput.delete(0, END)
     print("Active user:", activeUser)
-
-
 
 
 def processUserEnteredCode():
@@ -182,6 +193,7 @@ def processForgotCode():
 
 ##test stuff
 
+# REFACTOR
 def changePassword(newPassword):
     global savedUsername
     infile = open('UserData/userList.csv', 'r')
@@ -202,10 +214,7 @@ def changePassword(newPassword):
 global savedUsername
 savedUsername ="ddddd"
 changePassword("bbbbb")
-
-
-
-
+ 
 # Create subframe
 widthAdjuster = 0.4
 heightAdjuster = 0.2
@@ -239,7 +248,7 @@ registerButton.grid(row = 6, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
 #endregion
 
-# ===============RegisterAccount Frame 2=====================#
+#region ===============RegisterAccount Frame 2=====================#
 
 def uppercase_check(passEntry):
     if re.search('[A-Z]', passEntry): #atleast one uppercase character
@@ -269,7 +278,7 @@ def registerAccount():
     print("Register account clicked")
 
     # Store entries
-    userEntry = urInput.get()
+    userEntry = urInput.get().lower()
     emailEntry = emInput.get()
     passEntry = prInput.get()
     confEntry = pcInput.get()
@@ -359,7 +368,7 @@ confirmButton.grid(row = 10, column = 1, padx = 20, pady = 10, sticky = 'ew')
 
 returnButton = Button(registerMenu, text = "Return to login", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(loginFrame))
 returnButton.grid(row = 10, column = 0, padx = 20, pady = 10, sticky = 'ew')
-
+#endregion
 #region===============TwoFactorCode Frame 3=====================#
 
 def randomword(length):
@@ -392,6 +401,7 @@ def SendTwoFactorCode(email_recipent):
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, message)
     return code
+
 def SendResetCode(email_recipent):
     code = randomword(10)
     #do to make code random
