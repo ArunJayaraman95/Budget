@@ -303,13 +303,13 @@ def registerAccount():
  
             try:
                 auth.create_user_with_email_and_password(emailEntry, passEntry)
-                print("Account made")
-                print("User ", userEntry, "added!")
+                #print("Account made")
+                #print("User ", userEntry, "added!")
                 messagebox.showinfo("Success!", "User added!")
                 data = {'email': emailEntry, 'password': passEntry, 'username': userEntry}
                 db.child('userList').child(userEntry).set(data)
             except:
-                print("Email already exists")
+                #print("Email already exists")
                 messagebox.showwarning("Invalid", "Username or email is already in use. Try again.")
 
             
@@ -425,7 +425,6 @@ def SendResetCode(email_recipent):
 
 widthAdjuster2 = 0.37
 heightAdjuster2 = 0.2
-
 
 
 #New Frame
