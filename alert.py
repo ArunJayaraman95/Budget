@@ -20,4 +20,6 @@ def alertSend_Email(to, subject, message):
         message = "expense is over and it needs to reduce expense."
         alertSend_Email(
         to='test@test.com',        # Receiver's email
+        subject='Alerts',         # Subject of mail
+        message=message )               # The message as you want to send
     
