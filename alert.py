@@ -12,3 +12,5 @@ def alertSend_Email(to, subject, message):
     receiver_email = to # Enter receiver address
     password = "ra101112"
     message = "Subject: """+subject+"\n"+message
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
