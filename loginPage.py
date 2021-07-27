@@ -40,7 +40,7 @@ inputFont = ("Verdana", 16)
 usernameFont = ("Verdana", 12)
 
 def showFrame(frame_1):
-    frames =[loginFrame, registerFrame, twoFactorFrame, forgotFrame, homeFrame]
+    frames =[loginFrame, registerFrame, twoFactorFrame, forgotFrame, homeFrame, budgetFrame]
     frames.remove(frame_1)
     for frame in frames:
         frame.lower()
@@ -96,7 +96,7 @@ def logoutPressed():
 def showhome():
     showFrame(homeFrame)
 
-
+'''
 def forgotPassword():
     showFrame(forgotFrame)
     passEntry = pInput.get()
@@ -127,59 +127,42 @@ def forgotPassword():
     uInput.delete(0, END)
     pInput.delete(0, END)
     print("Active user:", activeUser)
-
+'''
 
 def submitLogin():
     global activeUser
-    print("Login submit button clicked")
+    #print("Login submit button clicked")
     userEntry = uInput.get().lower()
     passEntry = pInput.get()
 
     # Check credentials
-    print("Userentry", userEntry, uInput.get())
+    #print("Userentry", userEntry, uInput.get())
     users = db.child('userList').get()
     found = False
     for user in users:
-      if user.val()['username'] == userEntry:
-        try:
-          auth.sign_in_with_email_and_password(user.val()['email'], passEntry)
-          messagebox.showinfo("Welcome!", "Signed in!")
-          found = True
-          activeUser = userEntry
-          showFrame(budgetFrame)
-          displayCurrentMonth()
-        except:
-          messagebox.showwarning("Warning", "Invalid credentials")
-    if found == False:
-      messagebox.showwarning("Warning", "Invalid credentials")
-
-    # Clear inputs
-'''
-    with open('UserData/userList.csv', 'r') as file:
-        reader = csv.reader(file)
-        for line in reader:
-            print(line)
-            if line[0].lower().strip() == userEntry.lower() and line[1].strip() == passEntry:
-                print("In file")
-                foundFlag = True
+        if user.val()['username'] == userEntry:
+            found = True
+            try:
+                auth.sign_in_with_email_and_password(user.val()['email'], passEntry)
+                messagebox.showinfo("Welcome!", "Signed in!")
                 activeUser = userEntry
-                foundEmail  = line[2].lower().strip();
-                showFrame(twoFactorFrame)
-                global generatedCode
-                generatedCode = SendTwoFactorCode(foundEmail)
-                print(generatedCode)
-                break
-        if not foundFlag:
-            print("Username (" + userEntry + ") not found")
-            messagebox.showwarning("Warning", "User not found")         
-'''
+                showFrame(budgetFrame)
+                displayCurrentMonth()
+            except:
+                messagebox.showwarning("Warning", "Invalid 1credentials")
+    if found == False:
+      messagebox.showwarning("Warning", "Invalid 3credentials")
+
+        
     uInput.delete(0, END)
     pInput.delete(0, END)
-    print("Active user:", activeUser)
+    #print("Active user:", activeUser)
+    # Clear inputs
+
 
 
 def processUserEnteredCode():
-    print("Register account clicked")
+    #print("Register account clicked")
     global generatedCode
 
     # Store entries
@@ -260,7 +243,7 @@ pInput = Entry(loginMenu, width = 20, font = inputFont, show = '*')
 pInput.grid(row = 4, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
 
 # Create buttons
-forgotButton = Button(loginMenu, text = "Forgot Password", bg = "#A9e451", padx = 10, pady = 0, font = ("Verdana", 15), command = forgotPassword) #code here for new frame
+forgotButton = Button(loginMenu, text = "Forgot Password", bg = "#A9e451", padx = 10, pady = 0, font = ("Verdana", 15), command = lambda: showFrame(forgotFrame)) #code here for new frame
 forgotButton.grid(row = 5, column = 0, padx = 20, pady = 10, sticky = 'ew')
 submitButton = Button(loginMenu, text = "Submit", bg = "#A9e451", padx = 10, pady = 0, font = ("Verdana", 15), command = submitLogin) #code here for new frame
 submitButton.grid(row = 5, column = 1, padx = 20, pady = 10, sticky = 'ew')
@@ -296,7 +279,7 @@ def check(email):
 
 # Functions
 def registerAccount():
-    print("Register account clicked")
+    #print("Register account clicked")
 
     # Store entries
     userEntry = urInput.get().lower()
@@ -308,7 +291,7 @@ def registerAccount():
     # Check username
     userDB = db.child('userList').child(userEntry).get()
     if userDB.val():
-        print(userDB)
+        #print(userDB)
         foundFlag = True
                 
 
@@ -397,8 +380,8 @@ homeMenu = Frame(homeFrame, bg = accentColor)
 homeMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
 homeTitle = Label(homeMenu, text = "Home", font = ("Courier", 60), bg = accentColor)
 homeTitle.grid(row = 0, column = 0, padx = 10, pady = 10, columnspan = 2, sticky = "ew")
-homeLogOutButton = Button(homeMenu, text = "Log Out", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = logoutPressed)
-homeLogOutButton.grid(row = 3, column = 0, padx = 20, pady = 10, sticky = 'ew')
+homeLogOutButton = Button(budgetFrame, text = "Log Out", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = logoutPressed)
+homeLogOutButton.grid(row = 8, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
 
 #region===============TwoFactorCode Frame 3=====================#
@@ -597,18 +580,21 @@ budgetTree.tag_configure('evenrow', background = "blue")
 # Generate tuple from data for updates/insertions
 # This removes dollar signs and commas from monatory values
 def toTuple(date, name, planned, actual, notes = ""):
-    a = date
-    b = name
-    c = '${:,.2f}'.format(float(planned)) 
-    d = '${:,.2f}'.format(float(actual)) 
-    e = round(float(planned) - float(actual), 2)
-    e = '-${:,.2f}'.format(-e) if e < 0 else '${:,.2f}'.format(e)
-    if notes:
-        f = notes
-    else:
-        f = ""
-    return (a, b, c, d, e, f)
-
+    try:
+        a = date
+        b = str(name)
+        c = '${:,.2f}'.format(float(planned)) 
+        d = '${:,.2f}'.format(float(actual)) 
+        e = round(float(planned) - float(actual), 2)
+        e = '-${:,.2f}'.format(-e) if e < 0 else '${:,.2f}'.format(e)
+        if notes:
+            f = notes
+        else:
+            f = ""
+        return (a, b, c, d, e, f)
+    except:
+        print("Error in tuple input")
+        return -1
 
 def displayCurrentMonth():
     # Clear out table
@@ -627,7 +613,8 @@ def displayCurrentMonth():
                 tempTuple = toTuple(d, n, p, a, m)
                 budgetTree.insert(parent = '', index = 'end', iid = expense.key(), values = tempTuple)
     except:
-        print("No stuff in tree")
+        pass
+        #print("No stuff in tree")
 
    
 displayCurrentMonth()
@@ -664,6 +651,7 @@ def openAddMenu():
         monthEntry = selectedDate[:2]
         dayEntry = selectedDate[3:5]
         yearEntry = selectedDate[-4:]
+        return [monthEntry, dayEntry, yearEntry]
 
     # Buttons, labels, and entry widgets
     getDateButton = Button(top, text = "Use this date", command = grabDate)
@@ -838,7 +826,7 @@ def deleteExpense():
                     # Make sure the key in DB matches the iid
                     if exp.key() == iid:
                         db.child("userList").child(activeUser).child('expenses').child(iid).remove()
-                        print(iid, exp.key())
+                        #print(iid, exp.key())
                 budgetTree.delete(record)
 
 
@@ -861,7 +849,7 @@ def export():
 
     # For ALL expenses in DB with correct month
     for expense in db.child('userList').child(activeUser).child('expenses').get():
-        print(expense.val()['actual'])
+        #print(expense.val()['actual'])
         if expense.val()['date'][:2] == viewMonth:
             s1.write(rnum, cnum + 1, expense.val()['date'])
             s1.write(rnum, cnum + 2, expense.val()['name'])
@@ -889,7 +877,7 @@ removeButton.grid(row = 3, column = 4, pady = 20)
 removeButton.config(bg = '#d14232')
 
 convertButton = Button(budgetFrame, text = "Convert", command = export, font = usernameFont, height = 3, width = 15, bg = accentColor)
-convertButton.grid(row = 0, column = 0, pady = 0)
+convertButton.grid(row = 0, column = 0, pady = 10)
 
 # Formatting (font changes)
 style = ttk.Style()
