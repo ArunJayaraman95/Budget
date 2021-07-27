@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import messagebox
 import tkinter.font as font
 import re
-from PIL import ImageTk, Image
+#from PIL import ImageTk, Image
 import csv
 import smtplib, ssl
 import random, string
@@ -44,7 +44,11 @@ for frame in (loginFrame, registerFrame, twoFactorFrame, forgotFrame, homeFrame)
     frame.grid(row = 0, column = 0, sticky = "nsew")
 
 
+
 showFrame(registerFrame)
+
+
+
 sx = root.winfo_screenwidth() 
 sy = root.winfo_screenheight()
 
@@ -60,7 +64,7 @@ activeUser = ""
 
 
 
-#Functions
+# Functions
 
 def logoutPressed():
     global activeUser
@@ -69,7 +73,6 @@ def logoutPressed():
 
 def showhome():
     showFrame(homeFrame)
-
 
 def forgotPassword():
     global activeUser
@@ -94,10 +97,11 @@ def forgotPassword():
                 activeUser = userEntry
                 foundEmail  = line[2].lower().strip();
                 #messagebox.showinfo("Success!", "Welcome " + activeUser + "!")
-                loginFrame.grid_forget()#Hide/destroy the registerframe
+                
                 showFrame(forgotFrame)
                 global generatedPasswordCode
                 generatedPasswordCode = SendResetCode(foundEmail)
+                print(generatedPasswordCode)
                 return
                 #break
         if not foundFlag:
@@ -125,11 +129,10 @@ def submitLogin():
                 foundFlag = True
                 activeUser = userEntry
                 foundEmail  = line[2].lower().strip();
-                #messagebox.showinfo("Success!", "Welcome " + activeUser + "!")
-                registerFrame.grid_forget()#Hide/destroy the registerframe
                 showFrame(twoFactorFrame)
                 global generatedCode
                 generatedCode = SendTwoFactorCode(foundEmail)
+                print(generatedCode)
                 break
         if not foundFlag:
             print("Username (" + userEntry + ") not found")
@@ -151,8 +154,8 @@ def processUserEnteredCode():
     else:
         messagebox.showwarning("Hooray", "Hooray!!")
         
-        forgotFrame.grid_forget()#Hide/destroy the forgot frame
-        showFrame(loginFrame) 
+         
+        showhome()
 
 
 def processForgotCode():
@@ -169,8 +172,6 @@ def processForgotCode():
     elif len(passResetEntry) >= 8 and uppercase_check(passResetEntry) and lowercase_check(passResetEntry) and digit_check(passResetEntry):
         changePassword(passResetEntry)
         messagebox.showwarning("Hooray", "Password has been updated.")
-        
-        forgotFrame.grid_forget()#Hide/destroy the registerframe
         showFrame(loginFrame) 
     else:
         messagebox.showwarning("Alarm", "Password is weak \n Password Must be in \n 1) Minimum 8 characters.\n 2) The alphabets must be between [a-z].\n 3) At least one alphabet should be of Upper Case [A-Z].\n 4) At least 1 number or digit between [0-9].")
@@ -370,6 +371,14 @@ confirmButton.grid(row = 10, column = 1, padx = 20, pady = 10, sticky = 'ew')
 
 returnButton = Button(registerMenu, text = "Return to login", font = ("Verdana", 10), bg = mainColor, command = lambda: showFrame(loginFrame))
 returnButton.grid(row = 10, column = 0, padx = 20, pady = 10, sticky = 'ew')
+#================Home Page Setup=================================#
+
+homeMenu = Frame(homeFrame, bg = accentColor)
+homeMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
+homeTitle = Label(homeMenu, text = "Home", font = ("Courier", 60), bg = accentColor)
+homeTitle.grid(row = 0, column = 0, padx = 10, pady = 10, columnspan = 2, sticky = "ew")
+homeLogOutButton = Button(homeMenu, text = "Log Out", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = logoutPressed)
+homeLogOutButton.grid(row = 3, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
 # ===============TwoFactorCode Frame 3=====================#
 
@@ -394,7 +403,7 @@ def SendTwoFactorCode(email_recipent):
     receiver_email = email_recipent # Enter receiver address
     password = "ra101112"
     message = """\
-    Subject: Hi there
+    Subject: Authentication Code
 
     Your two factor authentication code is """+ code + "."
 
@@ -414,7 +423,7 @@ def SendResetCode(email_recipent):
     receiver_email = email_recipent # Enter receiver address
     password = "ra101112"
     message = """\
-    Subject: Hi there
+    Subject: Password Reset Code
 
     The code to reset your password is """+ code + "."
 
@@ -432,7 +441,7 @@ heightAdjuster2 = 0.2
 
 
 
-#New Frame for Forgot password
+#New Frame
 resetMenu = Frame(forgotFrame, bg = accentColor)
 resetMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
 # Create labels for resetMenun
@@ -443,7 +452,7 @@ enterresetcodeLabel = Label(resetMenu, text = "Enter code: ", font = usernameFon
 enterresetcodeLabel.grid(row = 1, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = "w")
 
 # Create input box for Enter code
-ecResetInput = Entry(resetMenu, width = 20, font = inputFont)
+ecResetInput = Entry(resetMenu, width = 15, font = inputFont)
 ecResetInput.grid(row = 2, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
 
 
@@ -473,7 +482,7 @@ doneResetButton.grid(row = 7, column = 0, padx = 20, pady = 10, sticky = 'ew')
 
 
 
-#New Frame for Two factor
+#New Frame
 factorMenu = Frame(twoFactorFrame, bg = accentColor)
 factorMenu.place(height = 600, width = 500, anchor = CENTER, rely = 0.5, relx = 0.5)
 # Create labels for Two-Factor Authentication
@@ -484,10 +493,12 @@ entercodeLabel = Label(factorMenu, text = "Enter code: ", font = usernameFont, b
 entercodeLabel.grid(row = 1, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = "w")
 
 # Create input box for Enter code
-ecInput = Entry(factorMenu, width = 20, font = inputFont)
+ecInput = Entry(factorMenu, width = 15, font = inputFont)
 ecInput.grid(row = 2, column = 0, padx = 10, pady = 10, columnspan = 2,sticky = 'ew')
 
 #Create buttons
 doneButton = Button(factorMenu, text = "Done", bg = "#A9E451", padx = 10, pady = 0, font = ("Verdana", 15), command = processUserEnteredCode)
 doneButton.grid(row = 3, column = 0, padx = 20, pady = 10, sticky = 'ew')
+
+
 root.mainloop()
